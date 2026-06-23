@@ -1,7 +1,7 @@
 # final-project-appdev
 Creating a Student Portal
 
-# Main Features
+# Student View
 - Main Website (HTML, CSS, PHP)
   - Navigation Taskbar
   - User Profile
@@ -34,7 +34,23 @@ Creating a Student Portal
     - Shows the subjects available for the user's program 
   - Schedule and Assessment
     - Shows user schedule, and tuition calculation
+  - Request Documents
+    - Dedicated page for requesting specific documents from the registrar 
 
+#Teacher View
+- Main Website (HTML, CSS, PHP)
+  - Manage Available Courses
+  - Manage Grades for Student Courses
+  - Manage Attendance for every meeting
+  - Manage Schedule
+
+#Registrar View
+- Main Website (HTML, CSS, PHP)
+  - Manage remaining balance of student
+  - Manage transactions
+  - Manage students' requirements and requests
+ 
+#Other Key Features
 - Database
   - 3 Tables, one for Students, one for Subjects, and one for Schedules
 
