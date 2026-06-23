@@ -37,27 +37,27 @@ Creating a Student Portal
   - Request Documents
     - Dedicated page for requesting specific documents from the registrar 
 
-#Teacher View
+# Teacher View
 - Main Website (HTML, CSS, PHP)
   - Manage Available Courses
   - Manage Grades for Student Courses
   - Manage Attendance for every meeting
   - Manage Schedule
 
-#Registrar View
+# Registrar View
 - Main Website (HTML, CSS, PHP)
   - Manage remaining balance of student
   - Manage transactions
   - Manage students' requirements and requests
  
-#Other Key Features
+# Other Key Features
 - Database
   - 3 Tables, one for Students, one for Subjects, and one for Schedules
 
 - CSS
   - Main theme: FEU
 
-#Specific Files Needed
+# Specific Files Needed
 - PHP
   - db.php, for managing database queries
   - add-student.php, for inputting new students into the database
