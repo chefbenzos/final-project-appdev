@@ -39,4 +39,13 @@ Creating a Student Portal
   - 3 Tables, one for Students, one for Subjects, and one for Schedules
 
 - CSS
+  - Main theme: FEU
+
+#Specific Files Needed
+- PHP
+  - db.php, for managing database queries
+  - add-student.php, for inputting new students into the database
+  - manage-student.php, for managing the status of a student's requirements, payment, and grades
+  - homepage.php, for the main features involving the webite
+    - Can be split into multiple pages for specific features  
  
