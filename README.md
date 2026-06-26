@@ -52,7 +52,7 @@ Creating a Student Portal
  
 # Other Key Features
 - Database
-  - 3 Tables, one for Students, one for Subjects, and one for Schedules
+  - 4 Tables, one for Students, one for Subjects, one for Schedules, and one for Teachers
 
 - CSS
   - Main theme: FEU
