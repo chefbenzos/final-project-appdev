@@ -162,4 +162,4 @@ $conn->query("
         FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE
     )
 ");
-
+?>
