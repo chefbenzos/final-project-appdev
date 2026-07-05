@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/styles/grade-report.css">
-    <title>Student Portal | Grade Report</title>
+    <title>Grade Report</title>
 </head>
 <body>
     <div class="dashboard">
