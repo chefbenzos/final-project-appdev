@@ -1,9 +1,6 @@
 <?php
 /*
-loginStudent(conn, identifier, password) => log a student in via student_number or institute_email
-loginTeacher(conn, email, password) => log a teacher in
-loginRegistrar(conn, email, password) => log a registrar in
-login(conn, role, identifier, password) => generic login dispatcher, role = 'student'|'teacher'|'registrar'
+loginUser(conn, table, emailColumn, identifier, password) => authenticate a user and return their profile
 addStudent(conn, data) => insert a new student record
 addTeacher(conn, data) => insert a new teacher record
 addRegistrar(conn, data) => insert a new registrar record
