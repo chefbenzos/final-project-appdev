@@ -94,7 +94,7 @@ $scholarships = ["None", "Academic", "Athletic", "Entrance", "Dean's Lister"];
 
 $passwords = ["secret", "class"];
 
-require "connection.php";
+require ("db.php");
 
 function randItem($arr) { return $arr[array_rand($arr)]; }
 

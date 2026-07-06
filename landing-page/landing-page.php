@@ -20,7 +20,7 @@
                 <input type="password" name="password" placeholder="" required>
             </div>
             <div class="auth-links">
-                <a href="main-dashboard-student.php">Login</a> <!--to be changed pa hindi dapat link lang toh-->
+                <a href="/final-project-appdev/student-page/main-dashboard-student.php">Login</a> <!--to be changed pa hindi dapat link lang toh-->
             </div>
         </main>
     </forms>
