@@ -48,7 +48,7 @@ $courses = [
             ["code" => "CPE105", "name" => "Embedded Systems",                      "units" => 3],
         ]
     ],
-    "BMA" => [
+    "BSMA" => [
         "name" => "Bachelor of Multimedia Arts",
         "subjects" => [
             ["code" => "MA101", "name" => "Introduction to Multimedia Arts",  "units" => 3],
@@ -94,7 +94,28 @@ $scholarships = ["None", "Academic", "Athletic", "Entrance", "Dean's Lister"];
 
 $passwords = ["secret", "class"];
 
-require "connection.php";
+require "db.php";
+
+$conn->query("SET FOREIGN_KEY_CHECKS = 0");
+
+$tables = [
+    "grades",
+    "enrollments",
+    "payments",
+    "documents",
+    "holds",
+    "schedules",
+    "subjects",
+    "teachers",
+    "registrars",
+    "students"
+];
+
+foreach ($tables as $table) {
+    $conn->query("TRUNCATE TABLE $table");
+}
+
+$conn->query("SET FOREIGN_KEY_CHECKS = 1");
 
 function randItem($arr) { return $arr[array_rand($arr)]; }
 
@@ -388,3 +409,5 @@ foreach ($studentsByProgram as $programCode => $studentIds) {
 echo "Inserted $holdCount hold records.\n";
 
 echo "Seeding complete!\n";
+
+?>
