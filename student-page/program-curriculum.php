@@ -28,7 +28,7 @@
             </nav>
         </aside>
         <main class="dashboard-main">
-            <div class="logout-row"><a href="landing-page.php">Log out</a></div>
+            <div class="logout-row"><a href="/final-project-appdev/landing-page/landing-page.php">Log out</a></div>
             <div class="page-shell">
                 <header class="topbar">
                     <h2>Program Curriculum</h2>

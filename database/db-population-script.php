@@ -94,6 +94,7 @@ $scholarships = ["None", "Academic", "Athletic", "Entrance", "Dean's Lister"];
 
 $passwords = ["secret", "class"];
 
+<<<<<<< HEAD
 require "db.php";
 
 $conn->query("SET FOREIGN_KEY_CHECKS = 0");
@@ -125,6 +126,9 @@ $row = $result->fetch_assoc();
 echo "Subjects after truncate: " . $row['total'] . "<br>";
 
 $conn->query("SET FOREIGN_KEY_CHECKS = 1");
+=======
+require ("db.php");
+>>>>>>> b4081f1d9ee0aa39ef78c91b45ce43a18076fc11
 
 function randItem($arr) { return $arr[array_rand($arr)]; }
 
