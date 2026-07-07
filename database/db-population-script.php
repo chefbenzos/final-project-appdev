@@ -94,7 +94,6 @@ $scholarships = ["None", "Academic", "Athletic", "Entrance", "Dean's Lister"];
 
 $passwords = ["secret", "class"];
 
-<<<<<<< HEAD
 require "db.php";
 
 $conn->query("SET FOREIGN_KEY_CHECKS = 0");
@@ -126,9 +125,6 @@ $row = $result->fetch_assoc();
 echo "Subjects after truncate: " . $row['total'] . "<br>";
 
 $conn->query("SET FOREIGN_KEY_CHECKS = 1");
-=======
-require ("db.php");
->>>>>>> b4081f1d9ee0aa39ef78c91b45ce43a18076fc11
 
 function randItem($arr) { return $arr[array_rand($arr)]; }
 
@@ -143,7 +139,7 @@ function makeEmail($first, $last, $domain, $counter) {
 
 $hasher = fn($plain) => password_hash($plain, PASSWORD_BCRYPT);
 
-echo "Seeding started...\n";
+echo "Seeding started..."."<br>";
 
 // =========================================================
 // 1. REGISTRARS (2)
@@ -161,7 +157,7 @@ for ($i = 1; $i <= 2; $i++) {
     $registrarIds[] = $conn->insert_id;
     $stmt->close();
 }
-echo "Inserted " . count($registrarIds) . " registrars.\n";
+echo "Inserted " . count($registrarIds) . " registrars."."<br>";
 
 // =========================================================
 // 2. SUBJECTS (5 subjects per program = 25 total)
@@ -184,7 +180,7 @@ foreach ($courses as $programCode => $data) {
         ];
     }
 }
-echo "Inserted subjects for " . count($courses) . " programs.\n";
+echo "Inserted subjects for " . count($courses) . " programs."."<br>";
 
 // =========================================================
 // 3. TEACHERS (2 per program = 10 total)
@@ -220,7 +216,7 @@ foreach ($courses as $programCode => $data) {
         $teacherAssignment[$programCode][$subjects[$i]["subject_id"]] = randItem($teacherPair);
     }
 }
-echo "Inserted 10 teachers (2 per program) and assigned subjects.\n";
+echo "Inserted 10 teachers (2 per program) and assigned subjects."."<br>";
 
 // =========================================================
 // 4. STUDENTS (20 per section = 100 total)
@@ -261,7 +257,7 @@ foreach ($courses as $programCode => $data) {
         $studentCounter++;
     }
 }
-echo "Inserted " . ($studentCounter - 1) . " students.\n";
+echo "Inserted " . ($studentCounter - 1) . " students."."<br>";
 
 // =========================================================
 // 5. SCHEDULES
@@ -302,7 +298,7 @@ foreach ($courses as $programCode => $data) {
         }
     }
 }
-echo "Inserted " . count($scheduleRows) . " schedule rows.\n";
+echo "Inserted " . count($scheduleRows) . " schedule rows."."<br>";
 
 // =========================================================
 // 6. ENROLLMENTS + GRADES
@@ -342,7 +338,7 @@ foreach ($scheduleRows as $row) {
         $gradeCount++;
     }
 }
-echo "Inserted $enrollmentCount enrollments and $gradeCount grade records.\n";
+echo "Inserted $enrollmentCount enrollments and $gradeCount grade records"."<br>";
 
 // =========================================================
 // 7. PAYMENTS (one per student)
@@ -372,7 +368,7 @@ foreach ($studentsByProgram as $programCode => $studentIds) {
         $paymentCount++;
     }
 }
-echo "Inserted $paymentCount payment records.\n";
+echo "Inserted $paymentCount payment records.<br>";
 
 // =========================================================
 // 8. DOCUMENTS (one per student)
@@ -395,7 +391,7 @@ foreach ($studentsByProgram as $programCode => $studentIds) {
         $documentCount++;
     }
 }
-echo "Inserted $documentCount document records.\n";
+echo "Inserted $documentCount document records.<br>";
 
 // =========================================================
 // 9. HOLDS (1 in 5)
@@ -419,8 +415,8 @@ foreach ($studentsByProgram as $programCode => $studentIds) {
         }
     }
 }
-echo "Inserted $holdCount hold records.\n";
+echo "Inserted $holdCount hold records"."<br>";
 
-echo "Seeding complete!\n";
+echo "Seeding complete!"."<br>";
 
 ?>
