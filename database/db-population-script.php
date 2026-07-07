@@ -112,8 +112,17 @@ $tables = [
 ];
 
 foreach ($tables as $table) {
-    $conn->query("TRUNCATE TABLE $table");
+    if (!$conn->query("TRUNCATE TABLE `$table`")) {
+        die("Failed to truncate $table: " . $conn->error);
+    }
+
+    echo "Truncated $table<br>";
 }
+
+$result = $conn->query("SELECT COUNT(*) AS total FROM subjects");
+$row = $result->fetch_assoc();
+
+echo "Subjects after truncate: " . $row['total'] . "<br>";
 
 $conn->query("SET FOREIGN_KEY_CHECKS = 1");
 
