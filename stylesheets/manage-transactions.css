@@ -1,0 +1,35 @@
+@import url("registrar-page-base.css");
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid;
+}
+
+form {
+    display: grid;
+    gap: 14px;
+    max-width: 560px;
+}
+
+label {
+    display: block;
+}
+
+input,
+select,
+button {
+    width: 100%;
+    padding: 11px 12px;
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
