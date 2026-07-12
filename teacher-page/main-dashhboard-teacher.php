@@ -25,7 +25,7 @@
         </aside>
 
         <main class="dashboard-main">
-            <div class="logout-row"><a href="landing-page.php">Log out</a></div>
+            <div class="logout-row"><a href="/final-project-appdev/index.php">Log out</a></div>
             <div class="teacher-shell">
                 <header class="topbar">
                     <div>

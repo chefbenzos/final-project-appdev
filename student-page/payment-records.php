@@ -30,7 +30,7 @@
         </aside>
 
         <main class="dashboard-main">
-            <div class="logout-row"><a href="/final-project-appdev/landing-page/landing-page.php">Log out</a></div>
+            <div class="logout-row"><a href="/final-project-appdev/index.php">Log out</a></div>
             <div class="page-shell">
                 <header class="topbar">
                     <h2>Payment Records</h2>

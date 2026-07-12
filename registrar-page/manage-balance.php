@@ -24,7 +24,7 @@
         </aside>
 
         <main class="dashboard-main">
-            <div class="logout-row"><a href="landing-page.php">Log out</a></div>
+            <div class="logout-row"><a href="/final-project-appdev/index.php">Log out</a></div>
             <div class="page-shell">
                 <header class="topbar">
                     <h2>Manage Balance</h2>

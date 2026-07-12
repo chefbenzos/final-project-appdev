@@ -38,7 +38,16 @@
     unset($row);
     unset($result);
 
-    $user_info_sql = "SELECT * FROM {$user_type}s WHERE email = '$email' OR institute_email = '$email'";
+    $user_info_sql = "";
+
+    if ($user_type === 'student') {
+        $user_info_sql = "SELECT * FROM students WHERE institute_email = '$email'";
+    } elseif ($user_type === 'registrar') {
+        $user_info_sql = "SELECT * FROM registrars WHERE email = '$email'";
+    } elseif ($user_type === 'teacher') {
+        $user_info_sql = "SELECT * FROM teachers WHERE email = '$email'";
+    }
+
     $result = mysqli_query($conn, $user_info_sql);
     $row = mysqli_fetch_assoc($result);
 
@@ -58,9 +67,9 @@
         $_SESSION['registration_status'] = $row['registration_status'];
         $_SESSION['student_type'] = $row['student_type'];
         $_SESSION['scholarship'] = $row['scholarship'];
+
     } elseif ($user_type === 'registrar') {
         $access_level = 'Location: /final-project-appdev/registrar-page/main-dashboard-registrar.php';
-        
     } elseif ($user_type === 'teacher') {
         $access_level = 'Location: /final-project-appdev/teacher-page/main-dashboard-teacher.php';
 
