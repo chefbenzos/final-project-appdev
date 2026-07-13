@@ -18,7 +18,6 @@ $conn->set_charset('utf8mb4');
 $conn->query("
     CREATE TABLE IF NOT EXISTS students (
         student_id          INT AUTO_INCREMENT PRIMARY KEY,
-        student_number      VARCHAR(20)  NOT NULL UNIQUE,
         last_name           VARCHAR(100) NOT NULL,
         first_name          VARCHAR(100) NOT NULL,
         middle_initial      CHAR(1)      DEFAULT '',

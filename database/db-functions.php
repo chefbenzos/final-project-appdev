@@ -80,7 +80,7 @@ function loginUser($conn, $table, $emailColumn, $identifier, $password) {
 // =========================================================
 
 function addStudent($conn, $data) {
-    $required = ['student_number', 'last_name', 'first_name', 'personal_email', 'institute_email', 'curriculum_code', 'password'];
+    $required = ['student_id', 'last_name', 'first_name', 'personal_email', 'institute_email', 'curriculum_code', 'password'];
     foreach ($required as $field) {
         if (empty($data[$field])) {
             return ['success' => false, 'error' => "Missing required field: $field"];
@@ -97,14 +97,14 @@ function addStudent($conn, $data) {
 
     $stmt = $conn->prepare("
         INSERT INTO students
-            (student_number, last_name, first_name, middle_initial, personal_email,
+            (last_name, first_name, middle_initial, personal_email,
              institute_email, citizenship, curriculum_code, year_level,
              registration_status, student_type, scholarship, password_hash)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
     $stmt->bind_param(
         "sssssssssssss",
-        $data['student_number'], $data['last_name'], $data['first_name'], $middleInitial,
+        $data['student_id'], $data['last_name'], $data['first_name'], $middleInitial,
         $data['personal_email'], $data['institute_email'], $citizenship, $data['curriculum_code'],
         $yearLevel, $registrationStatus, $studentType, $scholarship, $hash
     );
@@ -177,10 +177,10 @@ function addRegistrar($conn, $data) {
 function searchStudents($conn, $keyword) {
     $like = "%$keyword%";
     $stmt = $conn->prepare("
-        SELECT student_id, student_number, last_name, first_name, middle_initial,
+        SELECT student_id, student_id, last_name, first_name, middle_initial,
                institute_email, curriculum_code, year_level, registration_status
         FROM students
-        WHERE student_number LIKE ? OR first_name LIKE ? OR last_name LIKE ? OR institute_email LIKE ?
+        WHERE student_id LIKE ? OR first_name LIKE ? OR last_name LIKE ? OR institute_email LIKE ?
         ORDER BY last_name, first_name
     ");
     $stmt->bind_param("ssss", $like, $like, $like, $like);
@@ -203,7 +203,7 @@ function getStudentById($conn, $studentId) {
 }
 
 function getAllStudents($conn) {
-    $result = $conn->query("SELECT student_id, student_number, last_name, first_name, curriculum_code, year_level, registration_status FROM students ORDER BY last_name, first_name");
+    $result = $conn->query("SELECT student_id, student_id, last_name, first_name, curriculum_code, year_level, registration_status FROM students ORDER BY last_name, first_name");
     return $result->fetch_all(MYSQLI_ASSOC);
 }
 
