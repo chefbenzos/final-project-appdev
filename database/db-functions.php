@@ -144,7 +144,6 @@ function addTeacher($conn, $data) {
     $stmt->close();
     return ['success' => false, 'error' => $error];
 }
-
 function addRegistrar($conn, $data) {
     $required = ['last_name', 'first_name', 'email', 'password'];
     foreach ($required as $field) {
@@ -329,6 +328,7 @@ function getStudentBalance($conn, $studentId) {
 // =========================================================
 // GRADES
 // =========================================================
+
 function viewGrades($conn, $studentId, $semester = null, $schoolYear = null) {
     $sql = "
         SELECT g.grade_id, s.subject_code, s.subject_name, s.units,
@@ -384,6 +384,7 @@ function updateGrade($conn, $enrollmentId, $midterm, $finals, $passingGrade = 75
 // =========================================================
 // SCHEDULES
 // =========================================================
+
 function viewStudentSchedule($conn, $studentId) {
     $stmt = $conn->prepare("
         SELECT sch.schedule_id, s.subject_code, s.subject_name, s.units,
