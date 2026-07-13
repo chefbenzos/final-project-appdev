@@ -1,9 +1,10 @@
 <?php
     session_start();
-    require '../database/db.php';
+    require_once __DIR__ . '/../config.php';
+    require ROOT_PATH .'/database/db.php';
 
     if (!isset($_POST['login'])) {
-        header("Location: /final-project-appdev/index.php?msg=Please login first.");
+        header("Location: " . ROOT . "/index.php?msg=Please login first.");
         exit();
     }
 
@@ -20,14 +21,14 @@
     $result = mysqli_query($conn, $sql);
 
     if (mysqli_num_rows($result) != 1) {
-        header("Location: /final-project-appdev/index.php?msg=Invalid email or password.");
+        header("Location:" . ROOT . "/index.php?msg=Invalid email or password.");
         exit();
     } 
 
     $row = mysqli_fetch_assoc($result);
 
     if (!password_verify($password, $row['password_hash'])) {
-        header("Location: /final-project-appdev/index.php?msg=Invalid password.");
+        header("Location:" . ROOT . "/index.php?msg=Invalid password.&email=" . urlencode($email));
         exit();
     }
 
@@ -58,7 +59,7 @@
     $_SESSION['last_name'] = $row['last_name'];
 
     if ($user_type === 'student') { //Sets necessary information for specific users.
-        $access_level = 'Location: /final-project-appdev/student-page/academic-holds.php';
+        $access_level = "Location: " . ROOT . "/student-page/academic-holds.php";
 
         $_SESSION['middle_initial'] = $row['middle_initial'] ?? '';
         $_SESSION['personal_email'] = $row['personal_email'];
@@ -69,10 +70,10 @@
         $_SESSION['scholarship'] = $row['scholarship'];
 
     } elseif ($user_type === 'registrar') {
-        $access_level = 'Location: /final-project-appdev/registrar-page/main-dashboard-registrar.php';
+        $access_level = "Location: " . ROOT . "/registrar-page/main-dashboard-registrar.php";
 
     } elseif ($user_type === 'teacher') {
-        $access_level = 'Location: /final-project-appdev/teacher-page/main-dashboard-teacher.php';
+        $access_level = "Location: " . ROOT . "/teacher-page/main-dashboard-teacher.php";
 
         $_SESSION['department'] = $row['department'] ?? '';
     }

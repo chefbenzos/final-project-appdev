@@ -1,11 +1,16 @@
+<?php
+    require 'config.php';
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/final-project-appdev/stylesheets/landing-page.css">
+    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/landing-page.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    <script src="/final-project-appdev/javascript/password-verify.js" defer></script>
+    <script src="<?=ROOT?>/javascript/password-verify.js" defer></script>
 
     <title>Student Portal</title>
 </head>
@@ -15,20 +20,20 @@
         
         if(isset($_SESSION['email'])) {
             if ($_SESSION['user_type'] === 'student') {
-                header("Location: /final-project-appdev/php-scripts/main-dashboard-student.php");
+                header("Location:".ROOT."/php-scripts/main-dashboard-student.php");
             } elseif ($_SESSION['user_type'] === 'registrar') {
-                header("Location: /final-project-appdev/php-scripts/main-dashboard-registrar.php");
+                header("Location: ".ROOT."/php-scripts/main-dashboard-registrar.php");
             } elseif ($_SESSION['user_type'] === 'teacher') {
-                header("Location: /final-project-appdev/php-scripts/main-dashboard-teacher.php");
+                header("Location: ".ROOT."/php-scripts/main-dashboard-teacher.php");
             }
         }
     ?>
 
     <div class="center-items">
         <div class="login-header">
-            <form method="post" action="/final-project-appdev/php-scripts/login-process.php">
+            <form method="post" action="<?=ROOT?>/php-scripts/login-process.php">
                 <div class="logo-holder">
-                    <img src="images\PHP.png" alt="Logo here ideally">
+                    <img src="<?=ROOT?>/images/PHP.png" alt="Logo here ideally">
                 </div>
 
                 <div class="center-items">
@@ -38,7 +43,7 @@
                     
                 <div class="input-fields">
                     <label><span class="required">*</span> Email</label>
-                    <input type="text" name="email" placeholder="Enter your email ..." required>
+                    <input type="text" name="email" value="<?= htmlspecialchars($_GET['email'] ?? '') ?>" placeholder="Enter your email ..." required>
                 </div>
 
                 <div class="input-fields">
