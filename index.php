@@ -11,7 +11,6 @@
     }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,7 +41,7 @@
         <div class="login-header">
             <form method="post" action="<?=ROOT?>/php-scripts/login-process.php">
                 <div class="logo-holder">
-                    <img src="<?=ROOT?>/images/PHP.png" alt="Logo here ideally">
+                    <img src="<?=ROOT?>/image/BHP_Icon.png" alt="Logo here ideally">
                 </div>
 
                 <div class="center-items">

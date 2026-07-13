@@ -1,14 +1,29 @@
+<?php
+    session_start();
+    require_once __DIR__ . '/../config.php';
+    require ROOT_PATH .'/database/db.php';
+
+    // Check if the user is logged in and is a student
+    if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'student') {
+        header("Location: " . ROOT . "/index.php?msg=Access denied. Please log in as a student.");
+        exit();
+    }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/styles/program-curriculum.css">
+    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/main-dashboard-student.css">
+    <script src="<?=ROOT?>/javascript/main-dashboard-student.js" defer></script>
     <title>Program Curriculum</title>
 </head>
 <body>
     <div class="dashboard">
-        <aside class="sidebar" aria-label="Main navigation">
+        <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+            <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Collapse sidebar" aria-expanded="true">&#9776;</button>
+
             <div class="portal-brand">
                 <h1>Student Portal</h1>
                 <p>Academic services dashboard</p>
@@ -28,7 +43,7 @@
             </nav>
         </aside>
         <main class="dashboard-main">
-            <div class="logout-row"><a href="/final-project-appdev/index.php">Log out</a></div>
+            <div class="logout-row"><a href="<?=ROOT?>/logout.php">Log out</a></div>
             <div class="page-shell">
                 <header class="topbar">
                     <h2>Program Curriculum</h2>
@@ -39,24 +54,20 @@
                         <h3>Curriculum Subjects</h3>
                     </div>
                     <div class="panel-body">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Year Level</th>
-                                    <th>Subject Code</th>
-                                    <th>Subject Title</th>
-                                    <th>Units</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>--</td>
-                                    <td>--</td>
-                                    <td>--</td>
-                                    <td>--</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="data-grid cols-4">
+                            <div class="data-grid-header">
+                                <span>Year Level</span>
+                                <span>Subject Code</span>
+                                <span>Subject Title</span>
+                                <span>Units</span>
+                            </div>
+                            <div class="data-grid-row">
+                                <span>--</span>
+                                <span>--</span>
+                                <span>--</span>
+                                <span>--</span>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </div>

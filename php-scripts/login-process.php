@@ -2,6 +2,7 @@
     session_start();
     require_once __DIR__ . '/../config.php';
     require ROOT_PATH .'/database/db.php';
+    require ROOT_PATH .'/database/db-functions.php';
 
     if (!isset($_POST['login'])) {
         header("Location: " . ROOT . "/index.php?msg=Please login first.");
@@ -59,8 +60,11 @@
     $_SESSION['last_name'] = $row['last_name'];
 
     if ($user_type === 'student') { //Sets necessary information for specific users.
-        $access_level = "Location: " . ROOT . "/student-page/academic-holds.php";
+        $access_level = "Location: " . ROOT . "/student-page/main-dashboard-student.php";
 
+        $_SESSION['grades'] = viewGrades($conn, $_SESSION['user_id']);
+        $_SESSION['student_number'] = $row['student_number'];
+        $_SESSION['citizenship'] = $row['citizenship'] ?? '';
         $_SESSION['middle_initial'] = $row['middle_initial'] ?? '';
         $_SESSION['personal_email'] = $row['personal_email'];
         $_SESSION['curriculum_code'] = $row['curriculum_code'];

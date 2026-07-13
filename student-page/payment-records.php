@@ -1,14 +1,29 @@
+<?php
+    session_start();
+    require_once __DIR__ . '/../config.php';
+    require ROOT_PATH .'/database/db.php';
+
+    // Check if the user is logged in and is a student
+    if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'student') {
+        header("Location: " . ROOT . "/index.php?msg=Access denied. Please log in as a student.");
+        exit();
+    }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/styles/payment-records.css">
+    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/main-dashboard-student.css">
+    <script src="<?=ROOT?>/javascript/main-dashboard-student.js" defer></script>
     <title>Payment Records</title>
 </head>
 <body>
     <div class="dashboard">
-        <aside class="sidebar" aria-label="Main navigation">
+        <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+            <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Collapse sidebar" aria-expanded="true">&#9776;</button>
+
             <div class="portal-brand">
                 <h1>Student Portal</h1>
                 <p>Academic services dashboard</p>
@@ -30,7 +45,7 @@
         </aside>
 
         <main class="dashboard-main">
-            <div class="logout-row"><a href="/final-project-appdev/index.php">Log out</a></div>
+            <div class="logout-row"><a href="<?=ROOT?>/logout.php">Log out</a></div>
             <div class="page-shell">
                 <header class="topbar">
                     <h2>Payment Records</h2>
@@ -42,24 +57,20 @@
                         <h3>Payment History</h3>
                     </div>
                     <div class="panel-body">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Reference Number</th>
-                                    <th>Payment Type</th>
-                                    <th>Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>--</td>
-                                    <td>--</td>
-                                    <td>--</td>
-                                    <td>PHP 0.00</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="data-grid cols-4">
+                            <div class="data-grid-header">
+                                <span>Date</span>
+                                <span>Reference Number</span>
+                                <span>Payment Type</span>
+                                <span>Amount</span>
+                            </div>
+                            <div class="data-grid-row">
+                                <span>--</span>
+                                <span>--</span>
+                                <span>--</span>
+                                <span>PHP 0.00</span>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </div>
