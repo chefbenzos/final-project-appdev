@@ -1,5 +1,13 @@
 <?php
     require 'config.php';
+    require __DIR__ . '/database/db.php';
+
+    $result = $conn->query("SELECT COUNT(*) FROM bhp_portal.students");
+    $row = $result->fetch_assoc();
+    $rowCount = $row['total'];
+    if ($rowCount == 0) {
+        require_once __DIR__ . '/database/db-population-script.php';
+    }
 ?>
 
 
