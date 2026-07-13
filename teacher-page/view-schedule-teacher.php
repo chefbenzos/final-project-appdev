@@ -1,9 +1,25 @@
+<?php
+    session_start();
+    require_once __DIR__ . '/../config.php';
+    require ROOT_PATH .'/database/db.php';
+    require ROOT_PATH . '/database/db-functions.php';
+
+    // Check if the user is logged in and is a teacher
+    if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'teacher') {
+        header("Location: " . ROOT . "/index.php?msg=Access denied. Please log in as a teacher.");
+        exit();
+    }
+
+    $teacherId = $_SESSION['user_id'];
+    $teacherSchedule = viewTeacherSchedule($conn, $teacherId);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/stylesheets/view-schedule-teacher.css">
+    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/view-schedule-teacher.css">
     <title>View Schedule</title>
 </head>
 <body>
@@ -25,7 +41,7 @@
         </aside>
 
         <main class="dashboard-main">
-            <div class="logout-row"><a href="/final-project-appdev/index.php">Log out</a></div>
+            <div class="logout-row"><a href="<?=ROOT?>/logout.php">Log out</a></div>
             <div class="page-shell">
                 <header class="topbar">
                     <h2>View Schedule</h2>
@@ -49,14 +65,18 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <?php if (empty($teacherSchedule)): ?>
+                                <tr><td colspan="6">No schedule found.</td></tr>
+                                <?php else: foreach ($teacherSchedule as $row): ?>
                                 <tr>
-                                    <td>--</td>
-                                    <td>--</td>
-                                    <td>--</td>
-                                    <td>--</td>
-                                    <td>--</td>
-                                    <td>--</td>
+                                    <td><?php echo htmlspecialchars($row['subject_code']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['subject_name']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['section']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['day']); ?></td>
+                                    <td><?php echo htmlspecialchars(substr($row['time_start'], 0, 5) . ' - ' . substr($row['time_end'], 0, 5)); ?></td>
+                                    <td><?php echo htmlspecialchars($row['room']); ?></td>
                                 </tr>
+                                <?php endforeach; endif; ?>
                             </tbody>
                         </table>
                     </div>

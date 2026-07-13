@@ -2,12 +2,19 @@
     session_start();
     require_once __DIR__ . '/../config.php';
     require ROOT_PATH .'/database/db.php';
+    require ROOT_PATH . '/database/db-functions.php';
 
     // Check if the user is logged in and is a student
     if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'student') {
         header("Location: " . ROOT . "/index.php?msg=Access denied. Please log in as a student.");
         exit();
     }
+
+    $curriculum = getProgramCurriculum($conn, $_SESSION['curriculum_code']);
+
+    // The current schema doesn't track a per-subject year level (only a per-student one),
+    // so every subject in the program is shown under the student's own current year level.
+    $yearLevel = $_SESSION['year_level'] ?? '1st Year';
 ?>
 
 <!DOCTYPE html>
@@ -61,12 +68,18 @@
                                 <span>Subject Title</span>
                                 <span>Units</span>
                             </div>
+                            <?php if (empty($curriculum)): ?>
                             <div class="data-grid-row">
-                                <span>--</span>
-                                <span>--</span>
-                                <span>--</span>
-                                <span>--</span>
+                                <span>No curriculum found for your program.</span>
                             </div>
+                            <?php else: foreach ($curriculum as $subj): ?>
+                            <div class="data-grid-row">
+                                <span><?php echo htmlspecialchars($yearLevel); ?></span>
+                                <span><?php echo htmlspecialchars($subj['subject_code']); ?></span>
+                                <span><?php echo htmlspecialchars($subj['subject_name']); ?></span>
+                                <span><?php echo htmlspecialchars($subj['units']); ?></span>
+                            </div>
+                            <?php endforeach; endif; ?>
                         </div>
                     </div>
                 </section>

@@ -2,12 +2,15 @@
     session_start();
     require_once __DIR__ . '/../config.php';
     require ROOT_PATH .'/database/db.php';
+    require ROOT_PATH . '/database/db-functions.php';
 
     // Check if the user is logged in and is a student
     if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'student') {
         header("Location: " . ROOT . "/index.php?msg=Access denied. Please log in as a student.");
         exit();
     }
+
+    $holds = viewHolds($conn, $_SESSION['user_id']);
 ?>
 
 <!DOCTYPE html>
@@ -62,11 +65,17 @@
                                 <span>Status</span>
                                 <span>Remarks</span>
                             </div>
+                            <?php if (empty($holds)): ?>
                             <div class="data-grid-row">
-                                <span>Sample-Form</span>
-                                <span>Pending</span>
-                                <span>Details here.</span>
+                                <span colspan="3">No holds on record. You're all clear!</span>
                             </div>
+                            <?php else: foreach ($holds as $hold): ?>
+                            <div class="data-grid-row">
+                                <span><?php echo htmlspecialchars($hold['hold_type']); ?></span>
+                                <span><?php echo $hold['resolved'] ? 'Resolved' : 'Pending'; ?></span>
+                                <span><?php echo htmlspecialchars($hold['description']); ?></span>
+                            </div>
+                            <?php endforeach; endif; ?>
                         </div>
                     </div>
                 </section>

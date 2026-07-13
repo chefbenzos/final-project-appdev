@@ -1,9 +1,46 @@
+<?php
+    session_start();
+    require_once __DIR__ . '/../config.php';
+    require ROOT_PATH .'/database/db.php';
+    require ROOT_PATH . '/database/db-functions.php';
+
+    // Check if the user is logged in and is a teacher
+    if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'teacher') {
+        header("Location: " . ROOT . "/index.php?msg=Access denied. Please log in as a teacher.");
+        exit();
+    }
+
+    $teacherId = $_SESSION['user_id'];
+    $teacherSchedule = viewTeacherSchedule($conn, $teacherId);
+
+    // Collapse the 5-day-a-week rows down to one row per subject/section,
+    // since a subject/section combination repeats once per weekday.
+    $courses = [];
+    foreach ($teacherSchedule as $row) {
+        $key = $row['schedule_id'] === null ? null : $row['subject_code'] . '|' . $row['section'];
+        if (!isset($courses[$key])) {
+            $courses[$key] = [
+                'subject_code' => $row['subject_code'],
+                'subject_name' => $row['subject_name'],
+                'units'        => $row['units'],
+                'section'      => $row['section'],
+                'schedule_id'  => $row['schedule_id'],
+                'enrolled'     => 0,
+            ];
+        }
+    }
+    foreach ($courses as $key => &$course) {
+        $course['enrolled'] = getEnrollmentCountForSchedule($conn, $course['schedule_id']);
+    }
+    unset($course);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/stylesheets/view-courses.css">
+    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/view-courses.css">
     <title>View Courses</title>
 </head>
 <body>
@@ -25,7 +62,7 @@
         </aside>
 
         <main class="dashboard-main">
-            <div class="logout-row"><a href="/final-project-appdev/index.php">Log out</a></div>
+            <div class="logout-row"><a href="<?=ROOT?>/logout.php">Log out</a></div>
             <div class="page-shell">
                 <header class="topbar">
                     <h2>View Courses</h2>
@@ -49,14 +86,20 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <?php if (empty($courses)): ?>
                                 <tr>
-                                    <td>--</td>
-                                    <td>--</td>
-                                    <td>--</td>
-                                    <td>--</td>
-                                    <td>--</td>
-                                    <td>--</td>
+                                    <td colspan="6">No courses currently assigned.</td>
                                 </tr>
+                                <?php else: foreach ($courses as $course): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($course['subject_code']); ?></td>
+                                    <td><?php echo htmlspecialchars($course['subject_name']); ?></td>
+                                    <td><?php echo htmlspecialchars($course['units']); ?></td>
+                                    <td><?php echo htmlspecialchars($course['section']); ?></td>
+                                    <td><?php echo (int) $course['enrolled']; ?></td>
+                                    <td>Active</td>
+                                </tr>
+                                <?php endforeach; endif; ?>
                             </tbody>
                         </table>
                     </div>
