@@ -152,7 +152,7 @@ $registrarIds = [];
 for ($i = 1; $i <= 2; $i++) {
     $fn = randItem($first_name);
     $ln = randItem($last_name);
-    $email = makeEmail($fn, $ln, "feu-registrar.edu.ph", $i);
+    $email = makeEmail($fn, $ln, "bhp-registrar.edu.ph", $i);
     $hash = $hasher(randItem($passwords));
 
     $stmt = $conn->prepare("INSERT INTO registrars (last_name, first_name, email, password_hash) VALUES (?, ?, ?, ?)");
@@ -199,7 +199,7 @@ foreach ($courses as $programCode => $data) {
     for ($t = 1; $t <= 2; $t++) {
         $fn = randItem($first_name);
         $ln = randItem($last_name);
-        $email = makeEmail($fn, $ln, "feu-faculty.edu.ph", $programCode . $t);
+        $email = makeEmail($fn, $ln, "bhp-faculty.edu.ph", $programCode . $t);
         $hash = $hasher(randItem($passwords));
 
         $stmt = $conn->prepare("INSERT INTO teachers (last_name, first_name, email, department, password_hash) VALUES (?, ?, ?, ?, ?)");
@@ -237,7 +237,7 @@ foreach ($courses as $programCode => $data) {
         $mi = randItem($middle_initials);
         $studentNumber = date('Y') . str_pad($studentCounter, 5, '0', STR_PAD_LEFT);
         $personalEmail  = makeEmail($fn, $ln, "gmail.com", $studentCounter);
-        $instituteEmail = makeEmail($fn, $ln, "students.feu.edu.ph", $studentCounter);
+        $instituteEmail = makeEmail($fn, $ln, "students.bhp.edu.ph", $studentCounter);
         $scholarship = randItem($scholarships);
         $hash = $hasher(randItem($passwords));
 
