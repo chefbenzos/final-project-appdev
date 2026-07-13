@@ -2,12 +2,22 @@
     session_start();
     require_once __DIR__ . '/../config.php';
     require ROOT_PATH .'/database/db.php';
+    require ROOT_PATH . '/database/db-functions.php';
 
     // Check if the user is logged in and is a student
     if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'student') {
         header("Location: " . ROOT . "/index.php?msg=Access denied. Please log in as a student.");
         exit();
     }
+
+    $bills = viewBills($conn, $_SESSION['user_id']);
+    $totalAssessment = 0;
+    $totalPaid = 0;
+    foreach ($bills as $bill) {
+        $totalAssessment += $bill['total_fees'];
+        $totalPaid += $bill['amount_paid'];
+    }
+    $remainingBalance = $totalAssessment - $totalPaid;
 ?>
 
 <!DOCTYPE html>
@@ -60,15 +70,15 @@
                         <div class="summary-grid">
                             <div class="summary-item">
                                 <span>Total Assessment</span>
-                                <strong>PHP 0.00</strong>
+                                <strong>PHP <?php echo number_format($totalAssessment, 2); ?></strong>
                             </div>
                             <div class="summary-item">
                                 <span>Total Paid</span>
-                                <strong>PHP 0.00</strong>
+                                <strong>PHP <?php echo number_format($totalPaid, 2); ?></strong>
                             </div>
                             <div class="summary-item">
                                 <span>Remaining Balance</span>
-                                <strong>PHP 0.00</strong>
+                                <strong>PHP <?php echo number_format($remainingBalance, 2); ?></strong>
                             </div>
                         </div>
                     </div>

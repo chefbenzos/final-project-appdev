@@ -2,12 +2,15 @@
     session_start();
     require_once __DIR__ . '/../config.php';
     require ROOT_PATH .'/database/db.php';
+    require ROOT_PATH . '/database/db-functions.php';
 
     // Check if the user is logged in and is a student
     if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'student') {
         header("Location: " . ROOT . "/index.php?msg=Access denied. Please log in as a student.");
         exit();
     }
+
+    $bills = viewBills($conn, $_SESSION['user_id']);
 ?>
 
 <!DOCTYPE html>
@@ -64,12 +67,18 @@
                                 <span>Payment Type</span>
                                 <span>Amount</span>
                             </div>
+                            <?php if (empty($bills)): ?>
                             <div class="data-grid-row">
-                                <span>--</span>
-                                <span>--</span>
-                                <span>--</span>
-                                <span>PHP 0.00</span>
+                                <span>No payment records found.</span>
                             </div>
+                            <?php else: foreach ($bills as $bill): ?>
+                            <div class="data-grid-row">
+                                <span><?php echo htmlspecialchars($bill['payment_date']); ?></span>
+                                <span>PAY-<?php echo str_pad($bill['payment_id'], 6, '0', STR_PAD_LEFT); ?></span>
+                                <span><?php echo htmlspecialchars($bill['payment_type']); ?></span>
+                                <span>PHP <?php echo number_format($bill['amount_paid'], 2); ?></span>
+                            </div>
+                            <?php endforeach; endif; ?>
                         </div>
                     </div>
                 </section>

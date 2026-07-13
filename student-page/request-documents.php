@@ -2,12 +2,36 @@
     session_start();
     require_once __DIR__ . '/../config.php';
     require ROOT_PATH .'/database/db.php';
+    require ROOT_PATH . '/database/db-functions.php';
 
     // Check if the user is logged in and is a student
     if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'student') {
         header("Location: " . ROOT . "/index.php?msg=Access denied. Please log in as a student.");
         exit();
     }
+
+    $studentId = $_SESSION['user_id'];
+    $saveMessage = '';
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['document_type'])) {
+        $docType = trim($_POST['document_type']);
+        $purpose = trim($_POST['request_purpose'] ?? '');
+
+        $result = addDocument($conn, [
+            'student_id' => $studentId,
+            'doc_type'   => $docType,
+            'status'     => 'pending',
+            'remarks'    => $purpose !== '' ? "Purpose: $purpose" : 'Awaiting review.',
+        ]);
+        $saveMessage = $result['success'] ? "Request submitted successfully." : "Error: " . $result['error'];
+    }
+
+    // Show this student's past requests for the document types requestable on this page
+    $requestDocTypes = ['Certificate of Registration', 'Transcript of Records', 'Certificate of Enrollment', 'Good Moral Certificate'];
+    $allDocuments = viewDocuments($conn, $studentId);
+    $myRequests = array_filter($allDocuments, function ($doc) use ($requestDocTypes) {
+        return in_array($doc['doc_type'], $requestDocTypes);
+    });
 ?>
 
 <!DOCTYPE html>
@@ -49,12 +73,17 @@
                     <h2>Request Documents</h2>
                     <p>Dedicated registrar request area for student documents.</p>
                 </header>
+
+                <?php if ($saveMessage): ?>
+                <div class="notice"><?php echo htmlspecialchars($saveMessage); ?></div>
+                <?php endif; ?>
+
                 <section class="panel">
                     <div class="panel-header">
                         <h3>Document Request Form</h3>
                     </div>
                     <div class="panel-body">
-                        <form>
+                        <form method="post" action="request-documents.php">
                             <label for="document-type">Document Type</label>
                             <select id="document-type" name="document_type">
                                 <option>Certificate of Registration</option>
@@ -66,8 +95,34 @@
                             <label for="request-purpose">Purpose</label>
                             <textarea id="request-purpose" name="request_purpose" placeholder="Enter request purpose"></textarea>
 
-                            <button type="button">Submit Request</button>
+                            <button type="submit">Submit Request</button>
                         </form>
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <div class="panel-header">
+                        <h3>Your Requests</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="data-grid cols-3">
+                            <div class="data-grid-header">
+                                <span>Document Type</span>
+                                <span>Date Requested</span>
+                                <span>Status</span>
+                            </div>
+                            <?php if (empty($myRequests)): ?>
+                            <div class="data-grid-row">
+                                <span>No document requests submitted yet.</span>
+                            </div>
+                            <?php else: foreach ($myRequests as $req): ?>
+                            <div class="data-grid-row">
+                                <span><?php echo htmlspecialchars($req['doc_type']); ?></span>
+                                <span><?php echo htmlspecialchars($req['submitted_at']); ?></span>
+                                <span><?php echo htmlspecialchars(ucfirst($req['status'])); ?></span>
+                            </div>
+                            <?php endforeach; endif; ?>
+                        </div>
                     </div>
                 </section>
             </div>

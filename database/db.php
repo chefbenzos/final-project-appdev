@@ -163,4 +163,21 @@ $conn->query("
     )
 ");
 
+//attendance (supports the teacher's Manage Attendance page)
+$conn->query("
+    CREATE TABLE IF NOT EXISTS attendance (
+        attendance_id   INT AUTO_INCREMENT PRIMARY KEY,
+        enrollment_id   INT          NOT NULL,
+        student_id      INT          NOT NULL,
+        schedule_id     INT          NOT NULL,
+        attendance_date DATE         NOT NULL,
+        status          VARCHAR(20)  DEFAULT 'present',
+        recorded_at     TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_attendance (enrollment_id, attendance_date),
+        FOREIGN KEY (enrollment_id) REFERENCES enrollments(enrollment_id) ON DELETE CASCADE,
+        FOREIGN KEY (student_id)    REFERENCES students(student_id)       ON DELETE CASCADE,
+        FOREIGN KEY (schedule_id)   REFERENCES schedules(schedule_id)     ON DELETE CASCADE
+    )
+");
+
 ?>

@@ -94,11 +94,12 @@ $scholarships = ["None", "Academic", "Athletic", "Entrance", "Dean's Lister"];
 
 $passwords = ["secret", "class"];
 
-require "db.php";
+require_once __DIR__ . '/db.php';
 
 $conn->query("SET FOREIGN_KEY_CHECKS = 0");
 
 $tables = [
+    "attendance",
     "grades",
     "enrollments",
     "payments",

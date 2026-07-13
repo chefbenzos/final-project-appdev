@@ -2,12 +2,15 @@
     session_start();
     require_once __DIR__ . '/../config.php';
     require ROOT_PATH .'/database/db.php';
+    require ROOT_PATH . '/database/db-functions.php';
 
     // Check if the user is logged in and is a student
     if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'student') {
         header("Location: " . ROOT . "/index.php?msg=Access denied. Please log in as a student.");
         exit();
     }
+
+    $offerings = getCourseOfferings($conn, $_SESSION['curriculum_code']);
 ?>
 
 <!DOCTYPE html>
@@ -61,12 +64,18 @@
                                 <span>Schedule</span>
                                 <span>Room</span>
                             </div>
+                            <?php if (empty($offerings)): ?>
                             <div class="data-grid-row">
-                                <span>--</span>
-                                <span>--</span>
-                                <span>--</span>
-                                <span>--</span>
+                                <span>No course offerings found for your program.</span>
                             </div>
+                            <?php else: foreach ($offerings as $row): ?>
+                            <div class="data-grid-row">
+                                <span><?php echo htmlspecialchars($row['subject_code']); ?></span>
+                                <span><?php echo htmlspecialchars($row['subject_name']); ?></span>
+                                <span><?php echo htmlspecialchars($row['day'] . ' ' . substr($row['time_start'], 0, 5) . '-' . substr($row['time_end'], 0, 5)); ?></span>
+                                <span><?php echo htmlspecialchars($row['room']); ?></span>
+                            </div>
+                            <?php endforeach; endif; ?>
                         </div>
                     </div>
                 </section>

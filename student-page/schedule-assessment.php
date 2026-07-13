@@ -2,11 +2,21 @@
     session_start();
     require_once __DIR__ . '/../config.php';
     require ROOT_PATH .'/database/db.php';
+    require ROOT_PATH . '/database/db-functions.php';
 
     // Check if the user is logged in and is a student
     if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'student') {
         header("Location: " . ROOT . "/index.php?msg=Access denied. Please log in as a student.");
         exit();
+    }
+
+    $studentId = $_SESSION['user_id'];
+    $schedule = viewStudentSchedule($conn, $studentId);
+    $bills = viewBills($conn, $studentId);
+
+    $totalAssessment = 0;
+    foreach ($bills as $bill) {
+        $totalAssessment += $bill['total_fees'];
     }
 ?>
 
@@ -61,12 +71,18 @@
                                 <span>Time</span>
                                 <span>Room</span>
                             </div>
+                            <?php if (empty($schedule)): ?>
                             <div class="data-grid-row">
-                                <span>--</span>
-                                <span>--</span>
-                                <span>--</span>
-                                <span>--</span>
+                                <span>No enrolled schedule found.</span>
                             </div>
+                            <?php else: foreach ($schedule as $row): ?>
+                            <div class="data-grid-row">
+                                <span><?php echo htmlspecialchars($row['subject_code'] . ' - ' . $row['subject_name']); ?></span>
+                                <span><?php echo htmlspecialchars($row['day']); ?></span>
+                                <span><?php echo htmlspecialchars(substr($row['time_start'], 0, 5) . ' - ' . substr($row['time_end'], 0, 5)); ?></span>
+                                <span><?php echo htmlspecialchars($row['room']); ?></span>
+                            </div>
+                            <?php endforeach; endif; ?>
                         </div>
                     </div>
                 </section>
@@ -82,7 +98,7 @@
                             </div>
                             <div class="data-grid-row">
                                 <span>Tuition and fees</span>
-                                <span>PHP 0.00</span>
+                                <span>PHP <?php echo number_format($totalAssessment, 2); ?></span>
                             </div>
                         </div>
                     </div>

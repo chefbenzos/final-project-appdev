@@ -1,9 +1,25 @@
+<?php
+    session_start();
+    require_once __DIR__ . '/../config.php';
+    require ROOT_PATH .'/database/db.php';
+    require ROOT_PATH . '/database/db-functions.php';
+
+    // Check if the user is logged in and is a registrar
+    if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'registrar') {
+        header("Location: " . ROOT . "/index.php?msg=Access denied. Please log in as a registrar.");
+        exit();
+    }
+
+    $registrarId = $_SESSION['user_id'];
+    $pendingRequests = getPendingDocumentRequests($conn);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/stylesheets/main-dashboard-registrar.css">
+    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/main-dashboard-registrar.css">
     <title>Registrar Profile</title>
 </head>
 <body>
@@ -24,7 +40,7 @@
         </aside>
 
         <main class="dashboard-main">
-            <div class="logout-row"><a href="/final-project-appdev/index.php">Log out</a></div>
+            <div class="logout-row"><a href="<?=ROOT?>/logout.php">Log out</a></div>
             <div class="registrar-shell">
                 <header class="topbar">
                     <div>
@@ -33,15 +49,15 @@
                     </div>
                     <div class="registrar-badge">
                         <span>Registrar</span>
-                        <strong>A.Y. 2025–2026</strong>
+                        <strong>A.Y. <?php echo date('Y') . '–' . (date('Y') + 1); ?></strong>
                     </div>
                 </header>
 
                 <section class="panel" id="registrar-profile">
                     <div class="panel-header">
                         <div>
-                            <h3>Welcome, Registrar Sample</h3>
-                            <p>Employee ID: REG-2024-001</p>
+                            <h3>Welcome, Registrar <?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?></h3>
+                            <p>Employee ID: REG-<?php echo str_pad($registrarId, 4, '0', STR_PAD_LEFT); ?></p>
                         </div>
                         <span class="status">Status: Active</span>
                     </div>
@@ -50,11 +66,10 @@
                             <div>
                                 <table>
                                     <tbody>
-                                        <tr><td>Employee ID</td><td>REG-2024-001</td></tr>
-                                        <tr><td>First Name</td><td>--</td></tr>
-                                        <tr><td>Middle Name</td><td>--</td></tr>
-                                        <tr><td>Last Name</td><td>--</td></tr>
-                                        <tr><td>Institute Email</td><td>--</td></tr>
+                                        <tr><td>Employee ID</td><td>REG-<?php echo str_pad($registrarId, 4, '0', STR_PAD_LEFT); ?></td></tr>
+                                        <tr><td>First Name</td><td><?php echo htmlspecialchars($_SESSION['first_name']); ?></td></tr>
+                                        <tr><td>Last Name</td><td><?php echo htmlspecialchars($_SESSION['last_name']); ?></td></tr>
+                                        <tr><td>Institute Email</td><td><?php echo htmlspecialchars($_SESSION['email']); ?></td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -64,7 +79,7 @@
                                         <tr><td>Office</td><td>University Registrar</td></tr>
                                         <tr><td>Position</td><td>Registrar</td></tr>
                                         <tr><td>Employment Status</td><td>Active</td></tr>
-                                        <tr><td>Academic Year</td><td>2025–2026</td></tr>
+                                        <tr><td>Academic Year</td><td><?php echo date('Y') . '–' . (date('Y') + 1); ?></td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -85,19 +100,21 @@
                                 <tr>
                                     <th>Student No.</th>
                                     <th>Document Type</th>
-                                    <th>Purpose</th>
                                     <th>Date Requested</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                <?php if (empty($pendingRequests)): ?>
+                                <tr><td colspan="4">No pending requests.</td></tr>
+                                <?php else: foreach ($pendingRequests as $req): ?>
                                 <tr>
-                                    <td>--</td>
-                                    <td>--</td>
-                                    <td>--</td>
-                                    <td>--</td>
-                                    <td>--</td>
+                                    <td><?php echo htmlspecialchars($req['student_number']); ?></td>
+                                    <td><?php echo htmlspecialchars($req['doc_type']); ?></td>
+                                    <td><?php echo htmlspecialchars($req['submitted_at']); ?></td>
+                                    <td><?php echo htmlspecialchars(ucfirst($req['status'])); ?></td>
                                 </tr>
+                                <?php endforeach; endif; ?>
                             </tbody>
                         </table>
                     </div>
