@@ -51,11 +51,11 @@
     $result = mysqli_query($conn, $user_info_sql);
     $row = mysqli_fetch_assoc($result);
 
+    $_SESSION['user_type'] = $user_type;
     $_SESSION['user_id'] = $row["{$user_type}_id"];
     $_SESSION['email'] = $row['institute_email'] ?? $row['email'];
     $_SESSION['first_name'] = $row['first_name'];
     $_SESSION['last_name'] = $row['last_name'];
-    
 
     if ($user_type === 'student') { //Sets necessary information for specific users.
         $access_level = 'Location: /final-project-appdev/student-page/academic-holds.php';
@@ -70,11 +70,12 @@
 
     } elseif ($user_type === 'registrar') {
         $access_level = 'Location: /final-project-appdev/registrar-page/main-dashboard-registrar.php';
+
     } elseif ($user_type === 'teacher') {
         $access_level = 'Location: /final-project-appdev/teacher-page/main-dashboard-teacher.php';
 
         $_SESSION['department'] = $row['department'] ?? '';
     }
+
     header($access_level);
-    
 ?>

@@ -31,6 +31,8 @@ sub {
     margin-bottom: 30px;
     min-width: 700px;
     border-radius: 10px;
+
+    box-shadow: #808080 10px 10px 5px;
 }
 
 .logo-holder {
@@ -113,4 +115,14 @@ input[type="submit"]:hover {
     text-align: center;
     color: red;
     font-weight: bold;
+}
+
+.fa-eye, .fa-eye-slash {
+    position: absolute;
+    right: 4%;
+    top: 25%;
+
+    transform: scale(1.2);
+    color: #B2BEB5;
+    cursor: pointer;
 }

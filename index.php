@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/final-project-appdev/stylesheets/landing-page.css">
-    <script src="/final-project-appdev/javascript/password-verify.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script src="/final-project-appdev/javascript/password-verify.js" defer></script>
 
     <title>Student Portal</title>
 </head>
@@ -12,9 +13,14 @@
     <?php
         session_start();
         
-        if(isset($_SESSION['user_id'])) {
-            header("Location: /final-project-appdev/php-scripts/dashboard.php");
-            exit();
+        if(isset($_SESSION['email'])) {
+            if ($_SESSION['user_type'] === 'student') {
+                header("Location: /final-project-appdev/php-scripts/main-dashboard-student.php");
+            } elseif ($_SESSION['user_type'] === 'registrar') {
+                header("Location: /final-project-appdev/php-scripts/main-dashboard-registrar.php");
+            } elseif ($_SESSION['user_type'] === 'teacher') {
+                header("Location: /final-project-appdev/php-scripts/main-dashboard-teacher.php");
+            }
         }
     ?>
 
@@ -32,12 +38,13 @@
                     
                 <div class="input-fields">
                     <label><span class="required">*</span> Email</label>
-                    <input type="text" name="email" placeholder="email" required>
+                    <input type="text" name="email" placeholder="Enter your email ..." required>
                 </div>
 
                 <div class="input-fields">
                     <label><span class="required">*</span> Password</label>
-                    <input type="password" name="password" placeholder="password" required>
+                    <input type="password" name="password" id="password" style="width: 88%;" placeholder="Enter password ..." required>
+                    <i class="fa-solid fa-eye" id="toggle-password"></i>
                 </div>
 
                 <div class="center-items">
