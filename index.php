@@ -20,11 +20,11 @@
         
         if(isset($_SESSION['email'])) {
             if ($_SESSION['user_type'] === 'student') {
-                header("Location:".ROOT."/php-scripts/main-dashboard-student.php");
+                header("Location:".ROOT."/student-page/main-dashboard-student.php");
             } elseif ($_SESSION['user_type'] === 'registrar') {
-                header("Location: ".ROOT."/php-scripts/main-dashboard-registrar.php");
+                header("Location: ".ROOT."/registrar-page/main-dashboard-registrar.php");
             } elseif ($_SESSION['user_type'] === 'teacher') {
-                header("Location: ".ROOT."/php-scripts/main-dashboard-teacher.php");
+                header("Location: ".ROOT."/teacher-page/main-dashboard-teacher.php");
             }
         }
     ?>
@@ -43,7 +43,7 @@
                     
                 <div class="input-fields">
                     <label><span class="required">*</span> Email</label>
-                    <input type="text" name="email" value="<?= htmlspecialchars($_GET['email'] ?? '') ?>" placeholder="Enter your email ..." required>
+                    <input type="text" name="email" value="<?= htmlspecialchars($_GET['email'] ?? '') ?>" placeholder="Enter your institute email ..." required>
                 </div>
 
                 <div class="input-fields">
