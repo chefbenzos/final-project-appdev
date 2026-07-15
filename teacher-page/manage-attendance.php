@@ -13,16 +13,22 @@
     $teacherId = $_SESSION['user_id'];
     $teacherSchedule = viewTeacherSchedule($conn, $teacherId);
 
+    // Dedupe the 5-day-a-week rows down to one dropdown entry per subject/section
+    // (teacherSchedule has one row per weekday meeting, so without this a course
+    // would show up 5 times in the dropdown with an identical label). The first
+    // occurrence per subject/section is kept, which is always its Monday row.
+    $seenCourses = [];
     $courseOptions = [];
     foreach ($teacherSchedule as $row) {
-        $courseOptions[$row['schedule_id']] = $row['subject_code'] . ' - ' . $row['subject_name'] . ' (' . $row['section'] . ')';
+        $key = $row['subject_code'] . '|' . $row['section'];
+        if (!isset($seenCourses[$key])) {
+            $seenCourses[$key] = true;
+            $courseOptions[$row['schedule_id']] = $row['subject_code'] . ' - ' . $row['subject_name'] . ' (' . $row['section'] . ')';
+        }
     }
-
-    $selectedScheduleId = isset($_GET['att_course']) ? (int) $_GET['att_course'] : null;
     $selectedDate = $_GET['att_date'] ?? date('Y-m-d');
     $saveMessage = '';
 
-    // Handle attendance save submissions
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['enrollment_id'])) {
         $selectedScheduleId = (int) $_POST['schedule_id'];
         $selectedDate = $_POST['attendance_date'];
@@ -56,7 +62,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/manage-attendance.css">
+    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/dashboard.css">
     <title>Manage Attendance</title>
 </head>
 <body>
@@ -105,12 +111,9 @@
                                 <?php endforeach; ?>
                             </select>
 
-                            <br><br>
-
                             <label for="att-date">Meeting Date</label>
                             <input type="date" id="att-date" name="att_date" value="<?php echo htmlspecialchars($selectedDate); ?>">
 
-                            <br><br>
                             <button type="submit">Load Class List</button>
                         </form>
                     </div>
@@ -124,41 +127,37 @@
                         <form method="post" action="manage-attendance.php">
                             <input type="hidden" name="schedule_id" value="<?php echo htmlspecialchars($selectedScheduleId ?? ''); ?>">
                             <input type="hidden" name="attendance_date" value="<?php echo htmlspecialchars($selectedDate); ?>">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Student No.</th>
-                                        <th>Last Name</th>
-                                        <th>First Name</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php if (!$selectedScheduleId): ?>
-                                    <tr><td colspan="4">Select a course and date above to load the class list.</td></tr>
-                                    <?php elseif (empty($students)): ?>
-                                    <tr><td colspan="4">No students are enrolled in this course.</td></tr>
-                                    <?php else: foreach ($students as $s):
-                                        $currentStatus = $existingAttendance[$s['enrollment_id']] ?? 'present';
-                                    ?>
-                                    <tr>
-                                        <td><?php echo htmlspecialchars($s['student_number']); ?></td>
-                                        <td><?php echo htmlspecialchars($s['last_name']); ?></td>
-                                        <td><?php echo htmlspecialchars($s['first_name']); ?></td>
-                                        <td>
-                                            <input type="hidden" name="enrollment_id[]" value="<?php echo $s['enrollment_id']; ?>">
-                                            <input type="hidden" name="student_id[]" value="<?php echo $s['student_id']; ?>">
-                                            <select name="status[]">
-                                                <option value="present" <?php echo $currentStatus === 'present' ? 'selected' : ''; ?>>Present</option>
-                                                <option value="absent" <?php echo $currentStatus === 'absent' ? 'selected' : ''; ?>>Absent</option>
-                                                <option value="late" <?php echo $currentStatus === 'late' ? 'selected' : ''; ?>>Late</option>
-                                                <option value="excused" <?php echo $currentStatus === 'excused' ? 'selected' : ''; ?>>Excused</option>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                    <?php endforeach; endif; ?>
-                                </tbody>
-                            </table>
+                            <div class="data-grid cols-4">
+                                <div class="data-grid-header">
+                                    <span>Student No.</span>
+                                    <span>Last Name</span>
+                                    <span>First Name</span>
+                                    <span>Status</span>
+                                </div>
+                                <?php if (!$selectedScheduleId): ?>
+                                <div class="data-grid-row"><span>Select a course and date above to load the class list.</span></div>
+                                <?php elseif (empty($students)): ?>
+                                <div class="data-grid-row"><span>No students are enrolled in this course.</span></div>
+                                <?php else: foreach ($students as $s):
+                                    $currentStatus = $existingAttendance[$s['enrollment_id']] ?? 'present';
+                                ?>
+                                <div class="data-grid-row">
+                                    <span><?php echo htmlspecialchars($s['student_number']); ?></span>
+                                    <span><?php echo htmlspecialchars($s['last_name']); ?></span>
+                                    <span><?php echo htmlspecialchars($s['first_name']); ?></span>
+                                    <span>
+                                        <input type="hidden" name="enrollment_id[]" value="<?php echo $s['enrollment_id']; ?>">
+                                        <input type="hidden" name="student_id[]" value="<?php echo $s['student_id']; ?>">
+                                        <select name="status[]">
+                                            <option value="present" <?php echo $currentStatus === 'present' ? 'selected' : ''; ?>>Present</option>
+                                            <option value="absent" <?php echo $currentStatus === 'absent' ? 'selected' : ''; ?>>Absent</option>
+                                            <option value="late" <?php echo $currentStatus === 'late' ? 'selected' : ''; ?>>Late</option>
+                                            <option value="excused" <?php echo $currentStatus === 'excused' ? 'selected' : ''; ?>>Excused</option>
+                                        </select>
+                                    </span>
+                                </div>
+                                <?php endforeach; endif; ?>
+                            </div>
                             <?php if ($selectedScheduleId && !empty($students)): ?>
                             <br>
                             <button type="submit">Save Attendance</button>

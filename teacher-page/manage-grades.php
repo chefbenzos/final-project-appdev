@@ -13,20 +13,24 @@
     $teacherId = $_SESSION['user_id'];
     $teacherSchedule = viewTeacherSchedule($conn, $teacherId);
 
-    // One dropdown entry per subject/section combination this teacher handles
+    // Dedupe the 5-day-a-week rows down to one dropdown entry per subject/section
+    // (teacherSchedule has one row per weekday meeting, so without this a course
+    // would show up 5 times in the dropdown with an identical label). The first
+    // occurrence per subject/section is kept, which is always its Monday row.
+    $seenCourses = [];
     $courseOptions = [];
     foreach ($teacherSchedule as $row) {
-        $courseOptions[$row['schedule_id']] = $row['subject_code'] . ' - ' . $row['subject_name'] . ' (' . $row['section'] . ')';
+        $key = $row['subject_code'] . '|' . $row['section'];
+        if (!isset($seenCourses[$key])) {
+            $seenCourses[$key] = true;
+            $courseOptions[$row['schedule_id']] = $row['subject_code'] . ' - ' . $row['subject_name'] . ' (' . $row['section'] . ')';
+        }
     }
-
-    $selectedScheduleId = isset($_GET['course_select']) ? (int) $_GET['course_select'] : null;
     $saveMessage = '';
 
-    // Handle grade save submissions
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['enrollment_id'])) {
         $selectedScheduleId = (int) $_POST['schedule_id'];
 
-        // Only allow saving grades for a course this teacher actually teaches (basic authorization check)
         if (array_key_exists($selectedScheduleId, $courseOptions)) {
             $enrollmentIds = $_POST['enrollment_id'];
             $midterms = $_POST['midterm'];
@@ -51,7 +55,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/manage-grades.css">
+    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/dashboard.css">
     <title>Manage Grades</title>
 </head>
 <body>
@@ -110,39 +114,35 @@
                     <div class="panel-body">
                         <form method="post" action="manage-grades.php">
                             <input type="hidden" name="schedule_id" value="<?php echo htmlspecialchars($selectedScheduleId ?? ''); ?>">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Student No.</th>
-                                        <th>Last Name</th>
-                                        <th>First Name</th>
-                                        <th>Midterm Grade</th>
-                                        <th>Final Grade</th>
-                                        <th>Remarks</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php if (!$selectedScheduleId): ?>
-                                    <tr><td colspan="6">Select a course above to view its class list.</td></tr>
-                                    <?php elseif (empty($students)): ?>
-                                    <tr><td colspan="6">No students are enrolled in this course.</td></tr>
-                                    <?php else: foreach ($students as $s): ?>
-                                    <tr>
-                                        <td><?php echo htmlspecialchars($s['student_number']); ?></td>
-                                        <td><?php echo htmlspecialchars($s['last_name']); ?></td>
-                                        <td><?php echo htmlspecialchars($s['first_name']); ?></td>
-                                        <td>
-                                            <input type="hidden" name="enrollment_id[]" value="<?php echo $s['enrollment_id']; ?>">
-                                            <input type="number" name="midterm[]" value="<?php echo htmlspecialchars($s['midterm']); ?>" placeholder="0.00" step="0.01">
-                                        </td>
-                                        <td>
-                                            <input type="number" name="finals[]" value="<?php echo htmlspecialchars($s['finals']); ?>" placeholder="0.00" step="0.01">
-                                        </td>
-                                        <td><?php echo htmlspecialchars($s['remarks'] ?? 'INC'); ?></td>
-                                    </tr>
-                                    <?php endforeach; endif; ?>
-                                </tbody>
-                            </table>
+                            <div class="data-grid cols-6">
+                                <div class="data-grid-header">
+                                    <span>Student No.</span>
+                                    <span>Last Name</span>
+                                    <span>First Name</span>
+                                    <span>Midterm Grade</span>
+                                    <span>Final Grade</span>
+                                    <span>Remarks</span>
+                                </div>
+                                <?php if (!$selectedScheduleId): ?>
+                                <div class="data-grid-row"><span>Select a course above to view its class list.</span></div>
+                                <?php elseif (empty($students)): ?>
+                                <div class="data-grid-row"><span>No students are enrolled in this course.</span></div>
+                                <?php else: foreach ($students as $s): ?>
+                                <div class="data-grid-row">
+                                    <span><?php echo htmlspecialchars($s['student_number']); ?></span>
+                                    <span><?php echo htmlspecialchars($s['last_name']); ?></span>
+                                    <span><?php echo htmlspecialchars($s['first_name']); ?></span>
+                                    <span>
+                                        <input type="hidden" name="enrollment_id[]" value="<?php echo $s['enrollment_id']; ?>">
+                                        <input type="number" name="midterm[]" value="<?php echo htmlspecialchars($s['midterm']); ?>" placeholder="0.00" step="0.01">
+                                    </span>
+                                    <span>
+                                        <input type="number" name="finals[]" value="<?php echo htmlspecialchars($s['finals']); ?>" placeholder="0.00" step="0.01">
+                                    </span>
+                                    <span><?php echo htmlspecialchars($s['remarks'] ?? 'INC'); ?></span>
+                                </div>
+                                <?php endforeach; endif; ?>
+                            </div>
                             <?php if ($selectedScheduleId && !empty($students)): ?>
                             <br>
                             <button type="submit">Save All Grades</button>

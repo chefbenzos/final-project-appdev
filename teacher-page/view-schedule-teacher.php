@@ -19,7 +19,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/view-schedule-teacher.css">
+    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/dashboard.css">
     <title>View Schedule</title>
 </head>
 <body>
@@ -53,32 +53,28 @@
                         <h3>Weekly Schedule</h3>
                     </div>
                     <div class="panel-body">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Course Code</th>
-                                    <th>Course Name</th>
-                                    <th>Section</th>
-                                    <th>Day</th>
-                                    <th>Time</th>
-                                    <th>Room</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (empty($teacherSchedule)): ?>
-                                <tr><td colspan="6">No schedule found.</td></tr>
-                                <?php else: foreach ($teacherSchedule as $row): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($row['subject_code']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['subject_name']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['section']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['day']); ?></td>
-                                    <td><?php echo htmlspecialchars(substr($row['time_start'], 0, 5) . ' - ' . substr($row['time_end'], 0, 5)); ?></td>
-                                    <td><?php echo htmlspecialchars($row['room']); ?></td>
-                                </tr>
-                                <?php endforeach; endif; ?>
-                            </tbody>
-                        </table>
+                        <div class="data-grid cols-6">
+                            <div class="data-grid-header">
+                                <span>Course Code</span>
+                                <span>Course Name</span>
+                                <span>Section</span>
+                                <span>Day</span>
+                                <span>Time</span>
+                                <span>Room</span>
+                            </div>
+                            <?php if (empty($teacherSchedule)): ?>
+                            <div class="data-grid-row"><span>No schedule found.</span></div>
+                            <?php else: foreach ($teacherSchedule as $row): ?>
+                            <div class="data-grid-row">
+                                <span><?php echo htmlspecialchars($row['subject_code']); ?></span>
+                                <span><?php echo htmlspecialchars($row['subject_name']); ?></span>
+                                <span><?php echo htmlspecialchars($row['section']); ?></span>
+                                <span><?php echo htmlspecialchars($row['day']); ?></span>
+                                <span><?php echo htmlspecialchars(substr($row['time_start'], 0, 5) . ' - ' . substr($row['time_end'], 0, 5)); ?></span>
+                                <span><?php echo htmlspecialchars($row['room']); ?></span>
+                            </div>
+                            <?php endforeach; endif; ?>
+                        </div>
                     </div>
                 </section>
             </div>

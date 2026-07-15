@@ -12,9 +12,6 @@
 
     $saveMessage = '';
 
-    // Handle a new transaction submission.
-    // Note: the "payments" table has one payment_type column, so the payment
-    // method and free-text reason are combined into that single field.
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['student_no'], $_POST['amount'])) {
         $studentNumber = trim($_POST['student_no']);
         $amount = (float) $_POST['amount'];
@@ -31,7 +28,6 @@
             if ($reason !== '') {
                 $paymentType .= ' - ' . $reason;
             }
-            // Truncate to fit the payment_type column (VARCHAR(50))
             $paymentType = substr($paymentType, 0, 50);
 
             $result = addPayment($conn, [
@@ -55,7 +51,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/manage-transactions.css">
+    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/dashboard.css">
     <title>Manage Transactions</title>
 </head>
 <body>
@@ -68,10 +64,13 @@
 
             <span class="nav-section-title">Navigation Taskbar</span>
             <nav class="taskbar">
-                <a href="main-dashboard-registrar.php">Dashboard</a>
+                <a href="main-dashboard-registrar.php">Registrar Profile</a>
+                <a href="enroll-student.php">Enroll Student</a>
                 <a href="manage-balance.php">Manage Balance</a>
                 <a class="active" href="manage-transactions.php">Manage Transactions</a>
                 <a href="manage-requirements.php">Manage Requirements</a>
+                <a href="payment-records.php">Payment Records</a>
+                <a href="program-curriculum.php">Program Curriculum</a>
             </nav>
         </aside>
 
@@ -121,28 +120,24 @@
                         <h3>Transaction History</h3>
                     </div>
                     <div class="panel-body">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Student No.</th>
-                                    <th>Payment Type</th>
-                                    <th>Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (empty($transactions)): ?>
-                                <tr><td colspan="4">No transactions recorded yet.</td></tr>
-                                <?php else: foreach ($transactions as $t): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($t['payment_date']); ?></td>
-                                    <td><?php echo htmlspecialchars($t['student_number']); ?></td>
-                                    <td><?php echo htmlspecialchars($t['payment_type']); ?></td>
-                                    <td>PHP <?php echo number_format($t['amount_paid'], 2); ?></td>
-                                </tr>
-                                <?php endforeach; endif; ?>
-                            </tbody>
-                        </table>
+                        <div class="data-grid cols-4">
+                            <div class="data-grid-header">
+                                <span>Date</span>
+                                <span>Student No.</span>
+                                <span>Payment Type</span>
+                                <span>Amount</span>
+                            </div>
+                            <?php if (empty($transactions)): ?>
+                            <div class="data-grid-row"><span>No transactions recorded yet.</span></div>
+                            <?php else: foreach ($transactions as $t): ?>
+                            <div class="data-grid-row">
+                                <span><?php echo htmlspecialchars($t['payment_date']); ?></span>
+                                <span><?php echo htmlspecialchars($t['student_number']); ?></span>
+                                <span><?php echo htmlspecialchars($t['payment_type']); ?></span>
+                                <span>PHP <?php echo number_format($t['amount_paid'], 2); ?></span>
+                            </div>
+                            <?php endforeach; endif; ?>
+                        </div>
                     </div>
                 </section>
             </div>

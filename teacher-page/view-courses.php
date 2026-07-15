@@ -13,11 +13,10 @@
     $teacherId = $_SESSION['user_id'];
     $teacherSchedule = viewTeacherSchedule($conn, $teacherId);
 
-    // Collapse the 5-day-a-week rows down to one row per subject/section,
-    // since a subject/section combination repeats once per weekday.
+    // Collapse the 5-day-a-week rows down to one row per subject/section
     $courses = [];
     foreach ($teacherSchedule as $row) {
-        $key = $row['schedule_id'] === null ? null : $row['subject_code'] . '|' . $row['section'];
+        $key = $row['subject_code'] . '|' . $row['section'];
         if (!isset($courses[$key])) {
             $courses[$key] = [
                 'subject_code' => $row['subject_code'],
@@ -29,7 +28,7 @@
             ];
         }
     }
-    foreach ($courses as $key => &$course) {
+    foreach ($courses as &$course) {
         $course['enrolled'] = getEnrollmentCountForSchedule($conn, $course['schedule_id']);
     }
     unset($course);
@@ -40,7 +39,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/view-courses.css">
+    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/dashboard.css">
     <title>View Courses</title>
 </head>
 <body>
@@ -74,34 +73,30 @@
                         <h3>Available Courses</h3>
                     </div>
                     <div class="panel-body">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Course Code</th>
-                                    <th>Course Name</th>
-                                    <th>Units</th>
-                                    <th>Section</th>
-                                    <th>Enrolled Students</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (empty($courses)): ?>
-                                <tr>
-                                    <td colspan="6">No courses currently assigned.</td>
-                                </tr>
-                                <?php else: foreach ($courses as $course): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($course['subject_code']); ?></td>
-                                    <td><?php echo htmlspecialchars($course['subject_name']); ?></td>
-                                    <td><?php echo htmlspecialchars($course['units']); ?></td>
-                                    <td><?php echo htmlspecialchars($course['section']); ?></td>
-                                    <td><?php echo (int) $course['enrolled']; ?></td>
-                                    <td>Active</td>
-                                </tr>
-                                <?php endforeach; endif; ?>
-                            </tbody>
-                        </table>
+                        <div class="data-grid cols-6">
+                            <div class="data-grid-header">
+                                <span>Course Code</span>
+                                <span>Course Name</span>
+                                <span>Units</span>
+                                <span>Section</span>
+                                <span>Enrolled Students</span>
+                                <span>Status</span>
+                            </div>
+                            <?php if (empty($courses)): ?>
+                            <div class="data-grid-row">
+                                <span>No courses currently assigned.</span>
+                            </div>
+                            <?php else: foreach ($courses as $course): ?>
+                            <div class="data-grid-row">
+                                <span><?php echo htmlspecialchars($course['subject_code']); ?></span>
+                                <span><?php echo htmlspecialchars($course['subject_name']); ?></span>
+                                <span><?php echo htmlspecialchars($course['units']); ?></span>
+                                <span><?php echo htmlspecialchars($course['section']); ?></span>
+                                <span><?php echo (int) $course['enrolled']; ?></span>
+                                <span>Active</span>
+                            </div>
+                            <?php endforeach; endif; ?>
+                        </div>
                     </div>
                 </section>
 

@@ -39,10 +39,17 @@ getStudentDashboardSummary(conn, studentId) => bundles profile, schedule, grades
 markAttendance(conn, data) => record or update one student's attendance for a class meeting date
 getAttendanceForSchedule(conn, scheduleId, date) => attendance already recorded for a schedule/date
 getAllStudentBalances(conn) => every student's total assessment, paid, and remaining balance
+getStudentBalanceByNumber(conn, studentNumber) => one student's balance summary, looked up by student number
 getAllPayments(conn) => a flat list of every payment transaction across all students
+getPaymentsByStudentNumber(conn, studentNumber) => one student's payment history, looked up by student number
 getPendingDocumentRequests(conn) => all documents across all students awaiting registrar action
 getAllDocuments(conn) => every document across every student
 getStudentIdByNumber(conn, studentNumber) => look up a student_id from a student_number
+getAllCurricula(conn) => every subject across every program, for a registrar-wide curriculum view
+getAllPrograms(conn) => every distinct program code + descriptive name, for an enrollment form dropdown
+generateStudentNumber(conn) => auto-generate the next sequential student number for the current year
+generateInstituteEmail(firstName, lastName, studentNumber) => auto-generate a unique institute email
+generateTempPassword(length) => generate a random temporary password for a newly-enrolled student
 */
 
 // =========================================================
@@ -301,7 +308,7 @@ function addPayment($conn, $data) {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ");
     $stmt->bind_param(
-        "idddssi",
+        "idddsssi",
         $data['student_id'], $data['total_fees'], $data['amount_paid'], $balance,
         $data['payment_type'], $data['payment_date'], $data['semester'], $data['school_year']
     );
@@ -397,16 +404,24 @@ function updateGrade($conn, $enrollmentId, $midterm, $finals, $passingGrade = 75
 // =========================================================
 
 function viewStudentSchedule($conn, $studentId) {
+    // A student is enrolled against just one representative schedule row per subject
+    // (its Monday meeting), so the full weekly timetable is reconstructed here by
+    // matching every schedule row that shares the same subject + section as
+    // whatever the student is actually enrolled in.
     $stmt = $conn->prepare("
         SELECT sch.schedule_id, s.subject_code, s.subject_name, s.units,
                t.first_name AS teacher_first_name, t.last_name AS teacher_last_name,
                sch.section, sch.day, sch.time_start, sch.time_end, sch.room,
-               sch.semester, sch.school_year, e.status AS enrollment_status
-        FROM enrollments e
-        JOIN schedules sch ON e.schedule_id = sch.schedule_id
+               sch.semester, sch.school_year
+        FROM schedules sch
         JOIN subjects s ON sch.subject_id = s.subject_id
         JOIN teachers t ON sch.teacher_id = t.teacher_id
-        WHERE e.student_id = ?
+        WHERE (sch.subject_id, sch.section) IN (
+            SELECT DISTINCT sch2.subject_id, sch2.section
+            FROM enrollments e
+            JOIN schedules sch2 ON e.schedule_id = sch2.schedule_id
+            WHERE e.student_id = ? AND e.status = 'active'
+        )
         ORDER BY FIELD(sch.day, 'Monday','Tuesday','Wednesday','Thursday','Friday'), sch.time_start
     ");
     $stmt->bind_param("i", $studentId);
@@ -604,7 +619,7 @@ function addSchedule($conn, $data) {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
     $stmt->bind_param(
-        "iisssssi",
+        "iissssssi",
         $data['subject_id'], $data['teacher_id'], $data['section'], $data['day'],
         $data['time_start'], $data['time_end'], $room, $data['semester'], $data['school_year']
     );
@@ -654,9 +669,10 @@ function addDocument($conn, $data) {
     }
     $status = $data['status'] ?? 'pending';
     $remarks = $data['remarks'] ?? 'Awaiting review.';
+    $filePath = $data['file_path'] ?? null;
 
-    $stmt = $conn->prepare("INSERT INTO documents (student_id, doc_type, status, remarks) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("isss", $data['student_id'], $data['doc_type'], $status, $remarks);
+    $stmt = $conn->prepare("INSERT INTO documents (student_id, doc_type, status, remarks, file_path) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param("issss", $data['student_id'], $data['doc_type'], $status, $remarks, $filePath);
 
     if ($stmt->execute()) {
         $id = $conn->insert_id;
@@ -830,6 +846,27 @@ function getAllStudentBalances($conn) {
     return $result->fetch_all(MYSQLI_ASSOC);
 }
 
+// Same balance summary as above, but scoped to a single student number for the
+// registrar's Manage Balance search box. Returns null if no match is found.
+function getStudentBalanceByNumber($conn, $studentNumber) {
+    $stmt = $conn->prepare("
+        SELECT st.student_id, st.student_number, st.last_name, st.first_name,
+               COALESCE(SUM(p.total_fees), 0)  AS total_assessment,
+               COALESCE(SUM(p.amount_paid), 0) AS total_paid,
+               COALESCE(SUM(p.balance), 0)     AS remaining_balance
+        FROM students st
+        LEFT JOIN payments p ON p.student_id = st.student_id
+        WHERE st.student_number = ?
+        GROUP BY st.student_id, st.student_number, st.last_name, st.first_name
+    ");
+    $stmt->bind_param("s", $studentNumber);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stmt->close();
+    return $row ?: null;
+}
+
 // A flat list of every payment transaction across all students, most recent first.
 // Used on Manage Transactions.
 function getAllPayments($conn) {
@@ -842,6 +879,24 @@ function getAllPayments($conn) {
     ";
     $result = $conn->query($sql);
     return $result->fetch_all(MYSQLI_ASSOC);
+}
+
+// Same as above, but scoped to a single student number for the Payment Records search box.
+function getPaymentsByStudentNumber($conn, $studentNumber) {
+    $stmt = $conn->prepare("
+        SELECT p.payment_id, p.payment_date, st.student_number,
+               st.last_name, st.first_name, p.payment_type, p.amount_paid
+        FROM payments p
+        JOIN students st ON p.student_id = st.student_id
+        WHERE st.student_number = ?
+        ORDER BY p.payment_date DESC, p.payment_id DESC
+    ");
+    $stmt->bind_param("s", $studentNumber);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $rows = $result->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+    return $rows;
 }
 
 // All documents across every student that are still awaiting registrar action.
@@ -883,5 +938,64 @@ function getStudentIdByNumber($conn, $studentNumber) {
     $row = $result->fetch_assoc();
     $stmt->close();
     return $row ? $row['student_id'] : null;
+}
+
+// Every subject across every program, for the registrar's full curriculum reference view.
+function getAllCurricula($conn) {
+    $sql = "SELECT subject_code, subject_name, units, department, program FROM subjects ORDER BY program, subject_code";
+    $result = $conn->query($sql);
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
+
+// =========================================================
+// STUDENT ENROLLMENT (registrar-side)
+// =========================================================
+
+// Every distinct program code + its descriptive name, for populating an enrollment form's course dropdown.
+function getAllPrograms($conn) {
+    $sql = "SELECT DISTINCT program, department FROM subjects ORDER BY program";
+    $result = $conn->query($sql);
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
+
+// Auto-generates the next sequential student number for the current year, e.g. "202600007".
+// Looks at the highest existing number under this year's prefix and increments it.
+function generateStudentNumber($conn) {
+    $yearPrefix = date('Y');
+    $stmt = $conn->prepare("
+        SELECT student_number FROM students
+        WHERE student_number LIKE CONCAT(?, '%')
+        ORDER BY student_number DESC LIMIT 1
+    ");
+    $stmt->bind_param("s", $yearPrefix);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stmt->close();
+
+    if ($row) {
+        $lastSequence = (int) substr($row['student_number'], strlen($yearPrefix));
+        $nextSequence = $lastSequence + 1;
+    } else {
+        $nextSequence = 1;
+    }
+
+    return $yearPrefix . str_pad($nextSequence, 5, '0', STR_PAD_LEFT);
+}
+
+// Auto-generates a unique institute email from a student's name and student number.
+function generateInstituteEmail($firstName, $lastName, $studentNumber) {
+    $slug = strtolower(preg_replace('/[^a-zA-Z]/', '', $firstName)) . '.' . strtolower(preg_replace('/[^a-zA-Z]/', '', $lastName));
+    return $slug . substr($studentNumber, -4) . '@students.bhp.edu.ph';
+}
+
+// Generates a random temporary password to hand to a newly-enrolled student.
+function generateTempPassword($length = 10) {
+    $chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789';
+    $password = '';
+    for ($i = 0; $i < $length; $i++) {
+        $password .= $chars[random_int(0, strlen($chars) - 1)];
+    }
+    return $password;
 }
 ?>

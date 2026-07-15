@@ -146,9 +146,17 @@ $conn->query("
         status          VARCHAR(20)  DEFAULT 'pending',
         submitted_at    TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
         remarks         TEXT         DEFAULT NULL,
+        file_path        VARCHAR(255) DEFAULT NULL,
         FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE
     )
 ");
+
+// Adds file_path to installations that already had a documents table created
+// before this column existed (safe no-op if it's already there).
+$existingColumns = $conn->query("SHOW COLUMNS FROM documents LIKE 'file_path'");
+if ($existingColumns && $existingColumns->num_rows === 0) {
+    $conn->query("ALTER TABLE documents ADD COLUMN file_path VARCHAR(255) DEFAULT NULL AFTER remarks");
+}
 
 //holds
 $conn->query("

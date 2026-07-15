@@ -19,7 +19,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/main-dashboard-registrar.css">
+    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/dashboard.css">
     <title>Registrar Profile</title>
 </head>
 <body>
@@ -33,23 +33,22 @@
             <span class="nav-section-title">Navigation Taskbar</span>
             <nav class="taskbar">
                 <a class="active" href="main-dashboard-registrar.php">Registrar Profile</a>
+                <a href="enroll-student.php">Enroll Student</a>
                 <a href="manage-balance.php">Manage Balance</a>
                 <a href="manage-transactions.php">Manage Transactions</a>
                 <a href="manage-requirements.php">Manage Requirements</a>
+                <a href="payment-records.php">Payment Records</a>
+                <a href="program-curriculum.php">Program Curriculum</a>
             </nav>
         </aside>
 
         <main class="dashboard-main">
             <div class="logout-row"><a href="<?=ROOT?>/logout.php">Log out</a></div>
-            <div class="registrar-shell">
+            <div class="profile-shell">
                 <header class="topbar">
                     <div>
                         <h2>Registrar Profile</h2>
                         <p>Registrar information and records service status.</p>
-                    </div>
-                    <div class="registrar-badge">
-                        <span>Registrar</span>
-                        <strong>A.Y. <?php echo date('Y') . '–' . (date('Y') + 1); ?></strong>
                     </div>
                 </header>
 
@@ -57,32 +56,19 @@
                     <div class="panel-header">
                         <div>
                             <h3>Welcome, Registrar <?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?></h3>
-                            <p>Employee ID: REG-<?php echo str_pad($registrarId, 4, '0', STR_PAD_LEFT); ?></p>
                         </div>
                         <span class="status">Status: Active</span>
                     </div>
                     <div class="panel-body">
-                        <div class="profile-grid">
-                            <div>
-                                <table>
-                                    <tbody>
-                                        <tr><td>Employee ID</td><td>REG-<?php echo str_pad($registrarId, 4, '0', STR_PAD_LEFT); ?></td></tr>
-                                        <tr><td>First Name</td><td><?php echo htmlspecialchars($_SESSION['first_name']); ?></td></tr>
-                                        <tr><td>Last Name</td><td><?php echo htmlspecialchars($_SESSION['last_name']); ?></td></tr>
-                                        <tr><td>Institute Email</td><td><?php echo htmlspecialchars($_SESSION['email']); ?></td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div>
-                                <table>
-                                    <tbody>
-                                        <tr><td>Office</td><td>University Registrar</td></tr>
-                                        <tr><td>Position</td><td>Registrar</td></tr>
-                                        <tr><td>Employment Status</td><td>Active</td></tr>
-                                        <tr><td>Academic Year</td><td><?php echo date('Y') . '–' . (date('Y') + 1); ?></td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                        <div class="info-grid">
+                            <div class="info-row"><span class="info-label">Employee ID</span><span>REG-<?php echo str_pad($registrarId, 4, '0', STR_PAD_LEFT); ?></span></div>
+                            <div class="info-row"><span class="info-label">First Name</span><span><?php echo htmlspecialchars($_SESSION['first_name']); ?></span></div>
+                            <div class="info-row"><span class="info-label">Last Name</span><span><?php echo htmlspecialchars($_SESSION['last_name']); ?></span></div>
+                            <div class="info-row"><span class="info-label">Institute Email</span><span><?php echo htmlspecialchars($_SESSION['email']); ?></span></div>
+                            <div class="info-row"><span class="info-label">Office</span><span>University Registrar</span></div>
+                            <div class="info-row"><span class="info-label">Position</span><span>Registrar</span></div>
+                            <div class="info-row"><span class="info-label">Employment Status</span><span>Active</span></div>
+                            <div class="info-row"><span class="info-label">Academic Year</span><span><?php echo date('Y') . '–' . (date('Y') + 1); ?></span></div>
                         </div>
                     </div>
                 </section>
@@ -95,28 +81,24 @@
                         </div>
                     </div>
                     <div class="panel-body">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Student No.</th>
-                                    <th>Document Type</th>
-                                    <th>Date Requested</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (empty($pendingRequests)): ?>
-                                <tr><td colspan="4">No pending requests.</td></tr>
-                                <?php else: foreach ($pendingRequests as $req): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($req['student_number']); ?></td>
-                                    <td><?php echo htmlspecialchars($req['doc_type']); ?></td>
-                                    <td><?php echo htmlspecialchars($req['submitted_at']); ?></td>
-                                    <td><?php echo htmlspecialchars(ucfirst($req['status'])); ?></td>
-                                </tr>
-                                <?php endforeach; endif; ?>
-                            </tbody>
-                        </table>
+                        <div class="data-grid cols-4">
+                            <div class="data-grid-header">
+                                <span>Student No.</span>
+                                <span>Document Type</span>
+                                <span>Date Requested</span>
+                                <span>Status</span>
+                            </div>
+                            <?php if (empty($pendingRequests)): ?>
+                            <div class="data-grid-row"><span>No pending requests.</span></div>
+                            <?php else: foreach ($pendingRequests as $req): ?>
+                            <div class="data-grid-row">
+                                <span><?php echo htmlspecialchars($req['student_number']); ?></span>
+                                <span><?php echo htmlspecialchars($req['doc_type']); ?></span>
+                                <span><?php echo htmlspecialchars($req['submitted_at']); ?></span>
+                                <span><?php echo htmlspecialchars(ucfirst($req['status'])); ?></span>
+                            </div>
+                            <?php endforeach; endif; ?>
+                        </div>
                     </div>
                 </section>
             </div>

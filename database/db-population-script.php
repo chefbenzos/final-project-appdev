@@ -295,6 +295,7 @@ foreach ($courses as $programCode => $data) {
                 "subject_id"  => $subj["subject_id"],
                 "teacher_id"  => $teacherId,
                 "program"     => $programCode,
+                "day"         => $day,
             ];
         }
     }
@@ -303,11 +304,20 @@ echo "Inserted " . count($scheduleRows) . " schedule rows."."<br>";
 
 // =========================================================
 // 6. ENROLLMENTS + GRADES
+//    A subject meets 5 days a week, but a student should only be enrolled
+//    -- and graded -- ONCE per subject, not once per weekday meeting.
+//    So enrollment is anchored to each subject's Monday schedule row; the
+//    other 4 weekday rows still exist in `schedules` purely for displaying
+//    the full weekly timetable (see viewStudentSchedule in db-functions.php).
 // =========================================================
 $enrollmentCount = 0;
 $gradeCount = 0;
 
 foreach ($scheduleRows as $row) {
+    if ($row["day"] !== "Monday") {
+        continue;
+    }
+
     $programCode = $row["program"];
     $studentIds = $studentsByProgram[$programCode];
 

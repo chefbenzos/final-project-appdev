@@ -10,9 +10,6 @@
         exit();
     }
 
-    // Requested documents (transcripts, certificates, etc.) vs admission requirements
-    // (birth certificate, Form 138, etc.) both live in the same `documents` table,
-    // distinguished here by doc_type.
     $requestDocTypes = ['Certificate of Registration', 'Transcript of Records', 'Certificate of Enrollment', 'Good Moral Certificate'];
 
     $saveMessage = '';
@@ -39,7 +36,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/manage-requirements.css">
+    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/dashboard.css">
     <title>Manage Requirements</title>
 </head>
 <body>
@@ -52,10 +49,13 @@
 
             <span class="nav-section-title">Navigation Taskbar</span>
             <nav class="taskbar">
-                <a href="main-dashboard-registrar.php">Dashboard</a>
+                <a href="main-dashboard-registrar.php">Registrar Profile</a>
+                <a href="enroll-student.php">Enroll Student</a>
                 <a href="manage-balance.php">Manage Balance</a>
                 <a href="manage-transactions.php">Manage Transactions</a>
                 <a class="active" href="manage-requirements.php">Manage Requirements</a>
+                <a href="payment-records.php">Payment Records</a>
+                <a href="program-curriculum.php">Program Curriculum</a>
             </nav>
         </aside>
 
@@ -76,43 +76,39 @@
                         <h3>Admission Requirements</h3>
                     </div>
                     <div class="panel-body">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Student No.</th>
-                                    <th>Last Name</th>
-                                    <th>First Name</th>
-                                    <th>Requirement</th>
-                                    <th>Current Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (empty($admissionRequirements)): ?>
-                                <tr><td colspan="6">No admission requirement records found.</td></tr>
-                                <?php else: foreach ($admissionRequirements as $doc): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($doc['student_number']); ?></td>
-                                    <td><?php echo htmlspecialchars($doc['last_name']); ?></td>
-                                    <td><?php echo htmlspecialchars($doc['first_name']); ?></td>
-                                    <td><?php echo htmlspecialchars($doc['doc_type']); ?></td>
-                                    <td><?php echo htmlspecialchars(ucfirst($doc['status'])); ?></td>
-                                    <td>
-                                        <form method="post" action="manage-requirements.php" style="display:flex; gap:6px;">
-                                            <input type="hidden" name="document_id" value="<?php echo $doc['document_id']; ?>">
-                                            <select name="new_status">
-                                                <option value="pending" <?php echo $doc['status'] === 'pending' ? 'selected' : ''; ?>>Pending</option>
-                                                <option value="submitted" <?php echo $doc['status'] === 'submitted' ? 'selected' : ''; ?>>Submitted</option>
-                                                <option value="approved" <?php echo $doc['status'] === 'approved' ? 'selected' : ''; ?>>Approved</option>
-                                                <option value="rejected" <?php echo $doc['status'] === 'rejected' ? 'selected' : ''; ?>>Rejected</option>
-                                            </select>
-                                            <button type="submit">Update</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                <?php endforeach; endif; ?>
-                            </tbody>
-                        </table>
+                        <div class="data-grid cols-6">
+                            <div class="data-grid-header">
+                                <span>Student No.</span>
+                                <span>Last Name</span>
+                                <span>First Name</span>
+                                <span>Requirement</span>
+                                <span>Current Status</span>
+                                <span>Action</span>
+                            </div>
+                            <?php if (empty($admissionRequirements)): ?>
+                            <div class="data-grid-row"><span>No admission requirement records found.</span></div>
+                            <?php else: foreach ($admissionRequirements as $doc): ?>
+                            <div class="data-grid-row">
+                                <span><?php echo htmlspecialchars($doc['student_number']); ?></span>
+                                <span><?php echo htmlspecialchars($doc['last_name']); ?></span>
+                                <span><?php echo htmlspecialchars($doc['first_name']); ?></span>
+                                <span><?php echo htmlspecialchars($doc['doc_type']); ?></span>
+                                <span><?php echo htmlspecialchars(ucfirst($doc['status'])); ?></span>
+                                <span>
+                                    <form method="post" action="manage-requirements.php" class="inline-form">
+                                        <input type="hidden" name="document_id" value="<?php echo $doc['document_id']; ?>">
+                                        <select name="new_status">
+                                            <option value="pending" <?php echo $doc['status'] === 'pending' ? 'selected' : ''; ?>>Pending</option>
+                                            <option value="submitted" <?php echo $doc['status'] === 'submitted' ? 'selected' : ''; ?>>Submitted</option>
+                                            <option value="approved" <?php echo $doc['status'] === 'approved' ? 'selected' : ''; ?>>Approved</option>
+                                            <option value="rejected" <?php echo $doc['status'] === 'rejected' ? 'selected' : ''; ?>>Rejected</option>
+                                        </select>
+                                        <button type="submit">Update</button>
+                                    </form>
+                                </span>
+                            </div>
+                            <?php endforeach; endif; ?>
+                        </div>
                     </div>
                 </section>
 
@@ -121,41 +117,37 @@
                         <h3>Document Requests</h3>
                     </div>
                     <div class="panel-body">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Student No.</th>
-                                    <th>Document Type</th>
-                                    <th>Date Requested</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (empty($documentRequests)): ?>
-                                <tr><td colspan="5">No document requests found.</td></tr>
-                                <?php else: foreach ($documentRequests as $doc): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($doc['student_number']); ?></td>
-                                    <td><?php echo htmlspecialchars($doc['doc_type']); ?></td>
-                                    <td><?php echo htmlspecialchars($doc['submitted_at']); ?></td>
-                                    <td><?php echo htmlspecialchars(ucfirst($doc['status'])); ?></td>
-                                    <td>
-                                        <form method="post" action="manage-requirements.php" style="display:flex; gap:6px;">
-                                            <input type="hidden" name="document_id" value="<?php echo $doc['document_id']; ?>">
-                                            <select name="new_status">
-                                                <option value="pending" <?php echo $doc['status'] === 'pending' ? 'selected' : ''; ?>>Pending</option>
-                                                <option value="processing" <?php echo $doc['status'] === 'processing' ? 'selected' : ''; ?>>Processing</option>
-                                                <option value="ready" <?php echo $doc['status'] === 'ready' ? 'selected' : ''; ?>>Ready for Pickup</option>
-                                                <option value="released" <?php echo $doc['status'] === 'released' ? 'selected' : ''; ?>>Released</option>
-                                            </select>
-                                            <button type="submit">Update</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                <?php endforeach; endif; ?>
-                            </tbody>
-                        </table>
+                        <div class="data-grid cols-5">
+                            <div class="data-grid-header">
+                                <span>Student No.</span>
+                                <span>Document Type</span>
+                                <span>Date Requested</span>
+                                <span>Status</span>
+                                <span>Action</span>
+                            </div>
+                            <?php if (empty($documentRequests)): ?>
+                            <div class="data-grid-row"><span>No document requests found.</span></div>
+                            <?php else: foreach ($documentRequests as $doc): ?>
+                            <div class="data-grid-row">
+                                <span><?php echo htmlspecialchars($doc['student_number']); ?></span>
+                                <span><?php echo htmlspecialchars($doc['doc_type']); ?></span>
+                                <span><?php echo htmlspecialchars($doc['submitted_at']); ?></span>
+                                <span><?php echo htmlspecialchars(ucfirst($doc['status'])); ?></span>
+                                <span>
+                                    <form method="post" action="manage-requirements.php" class="inline-form">
+                                        <input type="hidden" name="document_id" value="<?php echo $doc['document_id']; ?>">
+                                        <select name="new_status">
+                                            <option value="pending" <?php echo $doc['status'] === 'pending' ? 'selected' : ''; ?>>Pending</option>
+                                            <option value="processing" <?php echo $doc['status'] === 'processing' ? 'selected' : ''; ?>>Processing</option>
+                                            <option value="ready" <?php echo $doc['status'] === 'ready' ? 'selected' : ''; ?>>Ready for Pickup</option>
+                                            <option value="released" <?php echo $doc['status'] === 'released' ? 'selected' : ''; ?>>Released</option>
+                                        </select>
+                                        <button type="submit">Update</button>
+                                    </form>
+                                </span>
+                            </div>
+                            <?php endforeach; endif; ?>
+                        </div>
                     </div>
                 </section>
             </div>

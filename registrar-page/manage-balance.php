@@ -10,26 +10,13 @@
         exit();
     }
 
-    $saveMessage = '';
+    $searchQuery = trim($_GET['search_student_id'] ?? '');
+    $searchResult = null;
+    $searchNotFound = false;
 
-    // Handle a balance adjustment (recorded as a payment with no new assessment,
-    // just an amount paid, so it reduces the student's outstanding balance).
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['student_id'], $_POST['adjustment'])) {
-        $studentId = (int) $_POST['student_id'];
-        $adjustment = (float) $_POST['adjustment'];
-
-        if ($adjustment > 0) {
-            $result = addPayment($conn, [
-                'student_id'   => $studentId,
-                'total_fees'   => 0,
-                'amount_paid'  => $adjustment,
-                'payment_type' => 'Balance Adjustment',
-                'payment_date' => date('Y-m-d'),
-                'semester'     => '1st Semester',
-                'school_year'  => (int) date('Y'),
-            ]);
-            $saveMessage = $result['success'] ? "Payment recorded." : "Error: " . $result['error'];
-        }
+    if ($searchQuery !== '') {
+        $searchResult = getStudentBalanceByNumber($conn, $searchQuery);
+        $searchNotFound = ($searchResult === null);
     }
 
     $balances = getAllStudentBalances($conn);
@@ -40,7 +27,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/manage-balance.css">
+    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/dashboard.css">
     <title>Manage Balance</title>
 </head>
 <body>
@@ -53,10 +40,13 @@
 
             <span class="nav-section-title">Navigation Taskbar</span>
             <nav class="taskbar">
-                <a href="main-dashboard-registrar.php">Dashboard</a>
+                <a href="main-dashboard-registrar.php">Registrar Profile</a>
+                <a href="enroll-student.php">Enroll Student</a>
                 <a class="active" href="manage-balance.php">Manage Balance</a>
                 <a href="manage-transactions.php">Manage Transactions</a>
                 <a href="manage-requirements.php">Manage Requirements</a>
+                <a href="payment-records.php">Payment Records</a>
+                <a href="program-curriculum.php">Program Curriculum</a>
             </nav>
         </aside>
 
@@ -65,52 +55,64 @@
             <div class="page-shell">
                 <header class="topbar">
                     <h2>Manage Balance</h2>
-                    <p>View and update the remaining balance of each student.</p>
+                    <p>Search a student's balance, or browse the full list below.</p>
                 </header>
 
-                <?php if ($saveMessage): ?>
-                <div class="notice"><?php echo htmlspecialchars($saveMessage); ?></div>
-                <?php endif; ?>
+                <section class="panel">
+                    <div class="panel-header">
+                        <h3>Search by Student ID</h3>
+                    </div>
+                    <div class="panel-body">
+                        <form method="get" action="manage-balance.php" class="inline-form">
+                            <input type="text" name="search_student_id" placeholder="e.g. 202600001" value="<?php echo htmlspecialchars($searchQuery); ?>">
+                            <button type="submit">Search</button>
+                            <?php if ($searchQuery !== ''): ?>
+                            <a href="manage-balance.php">Clear</a>
+                            <?php endif; ?>
+                        </form>
+
+                        <?php if ($searchNotFound): ?>
+                        <div class="notice">No student found with student number "<?php echo htmlspecialchars($searchQuery); ?>".</div>
+                        <?php elseif ($searchResult): ?>
+                        <div class="search-result-card">
+                            <h4>Balance for <?php echo htmlspecialchars($searchResult['first_name'] . ' ' . $searchResult['last_name']); ?> (<?php echo htmlspecialchars($searchResult['student_number']); ?>)</h4>
+                            <div class="info-grid">
+                                <div class="info-row"><span class="info-label">Total Assessment</span><span>PHP <?php echo number_format($searchResult['total_assessment'], 2); ?></span></div>
+                                <div class="info-row"><span class="info-label">Amount Paid</span><span>PHP <?php echo number_format($searchResult['total_paid'], 2); ?></span></div>
+                                <div class="info-row"><span class="info-label">Remaining Balance</span><span>PHP <?php echo number_format($searchResult['remaining_balance'], 2); ?></span></div>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                </section>
 
                 <section class="panel">
                     <div class="panel-header">
                         <h3>Student Balance Records</h3>
                     </div>
                     <div class="panel-body">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Student No.</th>
-                                    <th>Last Name</th>
-                                    <th>First Name</th>
-                                    <th>Total Assessment</th>
-                                    <th>Amount Paid</th>
-                                    <th>Remaining Balance</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (empty($balances)): ?>
-                                <tr><td colspan="7">No students found.</td></tr>
-                                <?php else: foreach ($balances as $b): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($b['student_number']); ?></td>
-                                    <td><?php echo htmlspecialchars($b['last_name']); ?></td>
-                                    <td><?php echo htmlspecialchars($b['first_name']); ?></td>
-                                    <td>PHP <?php echo number_format($b['total_assessment'], 2); ?></td>
-                                    <td>PHP <?php echo number_format($b['total_paid'], 2); ?></td>
-                                    <td>PHP <?php echo number_format($b['remaining_balance'], 2); ?></td>
-                                    <td>
-                                        <form method="post" action="manage-balance.php" style="display:flex; gap:6px;">
-                                            <input type="hidden" name="student_id" value="<?php echo $b['student_id']; ?>">
-                                            <input type="number" name="adjustment" placeholder="Amount" step="0.01" min="0.01" required>
-                                            <button type="submit">Update</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                <?php endforeach; endif; ?>
-                            </tbody>
-                        </table>
+                        <div class="data-grid cols-6">
+                            <div class="data-grid-header">
+                                <span>Student No.</span>
+                                <span>Last Name</span>
+                                <span>First Name</span>
+                                <span>Total Assessment</span>
+                                <span>Amount Paid</span>
+                                <span>Remaining Balance</span>
+                            </div>
+                            <?php if (empty($balances)): ?>
+                            <div class="data-grid-row"><span>No students found.</span></div>
+                            <?php else: foreach ($balances as $b): ?>
+                            <div class="data-grid-row">
+                                <span><?php echo htmlspecialchars($b['student_number']); ?></span>
+                                <span><?php echo htmlspecialchars($b['last_name']); ?></span>
+                                <span><?php echo htmlspecialchars($b['first_name']); ?></span>
+                                <span>PHP <?php echo number_format($b['total_assessment'], 2); ?></span>
+                                <span>PHP <?php echo number_format($b['total_paid'], 2); ?></span>
+                                <span>PHP <?php echo number_format($b['remaining_balance'], 2); ?></span>
+                            </div>
+                            <?php endforeach; endif; ?>
+                        </div>
                     </div>
                 </section>
             </div>
