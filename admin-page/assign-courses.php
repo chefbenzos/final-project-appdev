@@ -95,8 +95,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/main-dashboard-admin.css">
-    <script src="<?=ROOT?>/javascript/main-dashboard-student.js" defer></script>
+    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/dashboard.css">
+    <script src="<?=ROOT?>/javascript/dashboard-sidebar.js" defer></script>
     <title>Assign Courses to Teacher</title>
 </head>
 <body>

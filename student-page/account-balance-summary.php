@@ -26,7 +26,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="<?=ROOT?>/stylesheets/dashboard.css">
-    <script src="<?=ROOT?>/javascript/main-dashboard-student.js" defer></script>
+    <script src="<?=ROOT?>/javascript/dashboard-sidebar.js" defer></script>
     <title>Account Balance Summary</title>
 </head>
 <body>
