@@ -26,6 +26,12 @@
             $courseOptions[$row['schedule_id']] = $row['subject_code'] . ' - ' . $row['subject_name'] . ' (' . $row['section'] . ')';
         }
     }
+
+    $selectedScheduleId = (int) ($_GET['course_select'] ?? 0);
+    if ($selectedScheduleId !== 0 && !array_key_exists($selectedScheduleId, $courseOptions)) {
+        $selectedScheduleId = 0;
+    }
+
     $saveMessage = '';
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['enrollment_id'])) {
@@ -151,6 +157,7 @@
                     </div>
                 </section>
             </div>
+            <?php require ROOT_PATH . '/includes/footer.php'; ?>
         </main>
     </div>
 </body>

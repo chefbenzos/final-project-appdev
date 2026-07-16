@@ -26,6 +26,12 @@
             $courseOptions[$row['schedule_id']] = $row['subject_code'] . ' - ' . $row['subject_name'] . ' (' . $row['section'] . ')';
         }
     }
+
+    $selectedScheduleId = (int) ($_GET['att_course'] ?? 0);
+    if ($selectedScheduleId !== 0 && !array_key_exists($selectedScheduleId, $courseOptions)) {
+        $selectedScheduleId = 0;
+    }
+
     $selectedDate = $_GET['att_date'] ?? date('Y-m-d');
     $saveMessage = '';
 
@@ -166,6 +172,7 @@
                     </div>
                 </section>
             </div>
+            <?php require ROOT_PATH . '/includes/footer.php'; ?>
         </main>
     </div>
 </body>

@@ -76,5 +76,9 @@
             ?>
         </div>
     </div>
+    <?php
+        $footerVariant = 'login';
+        require ROOT_PATH . '/includes/footer.php';
+    ?>
 </body>
 </html>

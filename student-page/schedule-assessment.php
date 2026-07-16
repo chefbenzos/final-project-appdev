@@ -107,6 +107,7 @@
                     </div>
                 </section>
             </div>
+            <?php require ROOT_PATH . '/includes/footer.php'; ?>
         </main>
     </div>
 </body>

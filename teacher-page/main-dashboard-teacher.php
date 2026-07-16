@@ -29,7 +29,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/main-dashboard-teacher.css">
+    <link rel="stylesheet" href="<?=ROOT?>/stylesheets/dashboard.css">
     <title>Teacher Dashboard</title>
 </head>
 <body>
@@ -96,6 +96,7 @@
                 </section>
 
             </div>
+            <?php require ROOT_PATH . '/includes/footer.php'; ?>
         </main>
     </div>
 </body>

@@ -2,6 +2,7 @@ body {
     min-height: 100vh;
     margin: 0;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     background-color: #e1e6e8;
@@ -127,4 +128,67 @@ input[type="submit"]:hover {
     transform: scale(1.2);
     color: #848884;
     cursor: pointer;
+}
+
+body > .center-items {
+    width: 100%;
+    flex: 1;
+}
+
+.site-footer--login {
+    width: 100%;
+    padding: 18px 0;
+    border: 0;
+    background: transparent;
+    color: gray;
+    font-family:sans-serif;
+    text-align: center;
+}
+
+.site-footer--login p {
+    margin: 0;
+}
+
+/* Keep the login card and its text inside narrow windows. */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body,
+.login-header,
+.site-footer--login {
+    overflow-wrap: anywhere;
+}
+
+.login-header {
+    width: min(700px, calc(100% - 32px));
+    min-width: 0;
+}
+
+.logo-holder {
+    width: min(280px, 75vw);
+    height: auto;
+    aspect-ratio: 1;
+}
+
+@media (max-width: 520px) {
+    .login-header {
+        width: calc(100% - 20px);
+        padding: 14px;
+        box-shadow: #808080 5px 5px 4px;
+    }
+
+    .input-fields {
+        margin: 12px 0;
+    }
+
+    .input-fields > input {
+        width: calc(100% - 24px);
+    }
+
+    .site-footer--login {
+        padding: 14px 10px;
+    }
 }

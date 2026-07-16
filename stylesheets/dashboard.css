@@ -407,3 +407,215 @@ form button:hover {
 .search-result-card .info-grid {
     margin-bottom: 0;
 }
+
+.site-footer--standard {
+    width: 100%;
+    margin-top: auto;
+    padding: 18px 0;
+    border: 0;
+    background: transparent;
+    color: gray;
+    font-family: sans-serif;
+    text-align: center;
+}
+
+.site-footer--standard p {
+    margin: 0;
+}
+
+/* Responsive wrapping and narrow-window layout */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body,
+.taskbar a,
+.notice,
+.search-result-card,
+.site-footer--standard {
+    overflow-wrap: anywhere;
+}
+
+.panel,
+.panel-body,
+.page-shell,
+.profile-shell,
+.teacher-shell,
+.registrar-shell {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.teacher-shell,
+.registrar-shell {
+    width: 100%;
+}
+
+img {
+    max-width: 100%;
+}
+
+.topbar,
+.panel-header,
+.inline-form,
+.grade-filter-controls {
+    flex-wrap: wrap;
+}
+
+.topbar > *,
+.panel-header > *,
+.info-row > *,
+.summary-item,
+.data-grid-header span,
+.data-grid-row span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
+}
+
+.status {
+    min-width: 0;
+    white-space: normal;
+}
+
+.info-row {
+    grid-template-columns: minmax(120px, 180px) minmax(0, 1fr);
+}
+
+.data-grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.data-grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.data-grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.data-grid.cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.data-grid.cols-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.data-grid.cols-7 { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+
+/* Profile tables used by the teacher dashboard. */
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    min-width: 0;
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid black;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
+}
+
+@media (max-width: 900px) {
+    .sidebar {
+        width: clamp(150px, 30vw, 240px);
+        padding: 18px 12px;
+    }
+
+    .sidebar.collapsed {
+        width: 64px;
+        padding: 18px 10px;
+    }
+
+    .dashboard-main {
+        padding: 20px;
+    }
+
+    .info-grid,
+    .summary-grid,
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 720px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .info-row {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+
+    .data-grid-header span,
+    .data-grid-row span {
+        padding: 8px 6px;
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 520px) {
+    .sidebar {
+        width: clamp(115px, 34vw, 150px);
+        padding: 14px 8px;
+    }
+
+    .sidebar.collapsed {
+        width: 54px;
+        padding: 14px 7px;
+    }
+
+    .sidebar-logo {
+        width: min(90px, 100%);
+        height: auto;
+        aspect-ratio: 1;
+    }
+
+    .portal-brand {
+        padding: 0 4px 14px;
+    }
+
+    .portal-brand h1 {
+        font-size: 1rem;
+    }
+
+    .portal-brand p,
+    .nav-section-title,
+    .taskbar a {
+        font-size: 0.875rem;
+    }
+
+    .nav-section-title {
+        margin: 16px 4px 8px;
+    }
+
+    .taskbar a {
+        padding: 9px 7px;
+    }
+
+    .dashboard-main {
+        padding: 14px 10px;
+    }
+
+    .panel-body,
+    .panel-header {
+        padding: 14px;
+    }
+
+    .topbar,
+    .panel-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .inline-form > *,
+    .inline-form select,
+    .inline-form input[type="number"],
+    .inline-form input[type="text"],
+    .inline-form button,
+    .grade-filter-controls > * {
+        width: 100%;
+        max-width: 100%;
+    }
+}
