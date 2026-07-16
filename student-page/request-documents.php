@@ -49,6 +49,9 @@
             <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Collapse sidebar" aria-expanded="true">&#9776;</button>
 
             <div class="portal-brand">
+                <div class="sidebar-logo">
+                    <img src="<?=ROOT?>/image/BHP_Icon.png" alt="Logo">
+                </div>
                 <h1>Student Portal</h1>
                 <p>Academic services dashboard</p>
             </div>

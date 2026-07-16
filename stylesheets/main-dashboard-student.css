@@ -104,6 +104,25 @@ body {
     padding: 28px;
 }
 
+.sidebar-logo {
+    width: 154px;
+    height: 154px;
+    margin: 0 auto 14px;
+    border: 1px solid white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    overflow: hidden;
+}
+
+.sidebar-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
 .logout-row {
     text-align: right;
     margin-bottom: 5px;
