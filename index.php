@@ -44,7 +44,7 @@
         <div class="login-header">
             <form method="post" action="<?=ROOT?>/php-scripts/login-process.php">
                 <div class="logo-holder">
-                    <img src="<?=ROOT?>/image/BHP_Icon.png" alt="Logo here ideally">
+                    <img src="<?=ROOT?>/image/BHP_University_Crest_512.png" alt="BHP University crest">
                 </div>
 
                 <div class="center-items">

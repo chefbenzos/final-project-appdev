@@ -105,6 +105,9 @@
             <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Collapse sidebar" aria-expanded="true">&#9776;</button>
 
             <div class="portal-brand">
+                <div class="sidebar-logo">
+                    <img src="<?=ROOT?>/image/BHP_University_Crest_512.png" alt="BHP University crest">
+                </div>
                 <h1>Admin Portal</h1>
                 <p>System administration dashboard</p>
             </div>
