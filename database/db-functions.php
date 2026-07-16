@@ -162,6 +162,31 @@ function addTeacher($conn, $data) {
     $stmt->close();
     return ['success' => false, 'error' => $error];
 }
+function addAdmin($conn, $data) {
+    $required = ['last_name', 'first_name', 'email', 'password'];
+    foreach ($required as $field) {
+        if (empty($data[$field])) {
+            return ['success' => false, 'error' => "Missing required field: $field"];
+        }
+    }
+
+    $hash = hashPassword($data['password']);
+
+    $stmt = $conn->prepare("
+        INSERT INTO admins (last_name, first_name, email, password_hash)
+        VALUES (?, ?, ?, ?)
+    ");
+    $stmt->bind_param("ssss", $data['last_name'], $data['first_name'], $data['email'], $hash);
+
+    if ($stmt->execute()) {
+        $id = $conn->insert_id;
+        $stmt->close();
+        return ['success' => true, 'admin_id' => $id];
+    }
+    $error = $stmt->error;
+    $stmt->close();
+    return ['success' => false, 'error' => $error];
+}
 function addRegistrar($conn, $data) {
     $required = ['last_name', 'first_name', 'email', 'password'];
     foreach ($required as $field) {
@@ -659,6 +684,87 @@ function isRoomAvailable($conn, $room, $day, $timeStart, $timeEnd, $excludeSched
     return $row['conflict_count'] == 0;
 }
 
+function isTeacherAvailable($conn, $teacherId, $day, $timeStart, $timeEnd, $excludeScheduleId = null) {
+    $sql = "
+        SELECT COUNT(*) AS conflict_count FROM schedules
+        WHERE teacher_id = ? AND day = ?
+          AND time_start < ? AND time_end > ?
+    ";
+    $types = "isss";
+    $params = [$teacherId, $day, $timeEnd, $timeStart];
+
+    if ($excludeScheduleId !== null) {
+        $sql .= " AND schedule_id != ?";
+        $types .= "i";
+        $params[] = $excludeScheduleId;
+    }
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stmt->close();
+
+    return $row['conflict_count'] == 0;
+}
+
+function isSectionAvailable($conn, $section, $day, $timeStart, $timeEnd, $excludeScheduleId = null) {
+    $sql = "
+        SELECT COUNT(*) AS conflict_count FROM schedules
+        WHERE section = ? AND day = ?
+          AND time_start < ? AND time_end > ?
+    ";
+    $types = "ssss";
+    $params = [$section, $day, $timeEnd, $timeStart];
+
+    if ($excludeScheduleId !== null) {
+        $sql .= " AND schedule_id != ?";
+        $types .= "i";
+        $params[] = $excludeScheduleId;
+    }
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stmt->close();
+
+    return $row['conflict_count'] == 0;
+}
+
+// Every day + timeslot + room combination that is free for a given teacher AND section
+// (i.e. neither the teacher, nor the room, nor the section already has a class at that time).
+// Used by the admin "Add Courses to Teacher" dropdown so only non-conflicting options are offered.
+function getAvailableSlots($conn, $teacherId, $section) {
+    $days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    $timeSlots = [
+        ["07:30:00", "09:00:00"],
+        ["09:00:00", "10:30:00"],
+        ["10:30:00", "12:00:00"],
+        ["13:00:00", "14:30:00"],
+        ["14:30:00", "16:00:00"],
+    ];
+    $rooms = ["LAB101", "LAB102", "ROOM201", "ROOM202", "ROOM203", "ROOM204", "ROOM205"];
+
+    $available = [];
+    foreach ($days as $day) {
+        foreach ($timeSlots as $slot) {
+            [$start, $end] = $slot;
+            if (!isTeacherAvailable($conn, $teacherId, $day, $start, $end)) continue;
+            if (!isSectionAvailable($conn, $section, $day, $start, $end)) continue;
+
+            foreach ($rooms as $room) {
+                if (isRoomAvailable($conn, $room, $day, $start, $end)) {
+                    $available[] = ['day' => $day, 'time_start' => $start, 'time_end' => $end, 'room' => $room];
+                }
+            }
+        }
+    }
+    return $available;
+}
+
 // =========================================================
 // DOCUMENTS
 // =========================================================
@@ -941,6 +1047,13 @@ function getStudentIdByNumber($conn, $studentNumber) {
 }
 
 // Every subject across every program, for the registrar's full curriculum reference view.
+// Same data as getAllCurricula, but includes subject_id so it can be used in <select> dropdowns.
+function getAllSubjects($conn) {
+    $sql = "SELECT subject_id, subject_code, subject_name, units, department, program FROM subjects ORDER BY program, subject_code";
+    $result = $conn->query($sql);
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
+
 function getAllCurricula($conn) {
     $sql = "SELECT subject_code, subject_name, units, department, program FROM subjects ORDER BY program, subject_code";
     $result = $conn->query($sql);

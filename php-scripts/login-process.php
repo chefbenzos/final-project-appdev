@@ -17,7 +17,9 @@
             UNION ALL
             SELECT registrars.email, registrars.password_hash, 'registrar' as user_type FROM registrars WHERE registrars.email = '$email' 
             UNION ALL
-            SELECT teachers.email, teachers.password_hash, 'teacher' as user_type FROM teachers WHERE teachers.email = '$email'";
+            SELECT teachers.email, teachers.password_hash, 'teacher' as user_type FROM teachers WHERE teachers.email = '$email'
+            UNION ALL
+            SELECT admins.email, admins.password_hash, 'admin' as user_type FROM admins WHERE admins.email = '$email'";
     
     $result = mysqli_query($conn, $sql);
 
@@ -48,6 +50,8 @@
         $user_info_sql = "SELECT * FROM registrars WHERE email = '$email'";
     } elseif ($user_type === 'teacher') {
         $user_info_sql = "SELECT * FROM teachers WHERE email = '$email'";
+    } elseif ($user_type === 'admin') {
+        $user_info_sql = "SELECT * FROM admins WHERE email = '$email'";
     }
 
     $result = mysqli_query($conn, $user_info_sql);
@@ -80,6 +84,9 @@
         $access_level = "Location: " . ROOT . "/teacher-page/main-dashboard-teacher.php";
 
         $_SESSION['department'] = $row['department'] ?? '';
+
+    } elseif ($user_type === 'admin') {
+        $access_level = "Location: " . ROOT . "/admin-page/main-dashboard-admin.php";
     }
 
     header($access_level);

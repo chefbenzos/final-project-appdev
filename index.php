@@ -33,6 +33,8 @@
                 header("Location: ".ROOT."/registrar-page/main-dashboard-registrar.php");
             } elseif ($_SESSION['user_type'] === 'teacher') {
                 header("Location: ".ROOT."/teacher-page/main-dashboard-teacher.php");
+            } elseif ($_SESSION['user_type'] === 'admin') {
+                header("Location: ".ROOT."/admin-page/main-dashboard-admin.php");
             }
         }
     ?>

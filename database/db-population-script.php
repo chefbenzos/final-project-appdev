@@ -109,6 +109,7 @@ $tables = [
     "subjects",
     "teachers",
     "registrars",
+    "admins",
     "students"
 ];
 
@@ -141,6 +142,19 @@ function makeEmail($first, $last, $domain, $counter) {
 $hasher = fn($plain) => password_hash($plain, PASSWORD_BCRYPT);
 
 echo "Seeding started..."."<br>";
+
+// =========================================================
+// 0. ADMIN (1 default account)
+// =========================================================
+$adminHash = $hasher("admin123");
+$adminEmail = "admin@bhp-admin.edu.ph";
+$stmt = $conn->prepare("INSERT INTO admins (last_name, first_name, email, password_hash) VALUES (?, ?, ?, ?)");
+$adminLastName = "Portal";
+$adminFirstName = "Admin";
+$stmt->bind_param("ssss", $adminLastName, $adminFirstName, $adminEmail, $adminHash);
+$stmt->execute();
+$stmt->close();
+echo "Inserted default admin account (admin@bhp-admin.edu.ph / admin123).<br>";
 
 // =========================================================
 // 1. REGISTRARS (2)
