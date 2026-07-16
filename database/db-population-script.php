@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/../config.php';
 
 /*==========================================================
  Populating database 
@@ -443,5 +445,5 @@ foreach ($studentsByProgram as $programCode => $studentIds) {
 echo "Inserted $holdCount hold records"."<br>";
 
 echo "Seeding complete!"."<br>";
-
+header("Location:".ROOT."/index.php");
 ?>

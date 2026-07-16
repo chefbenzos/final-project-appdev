@@ -7,7 +7,8 @@
     $rowCount = $row['total'];
 
     if ($rowCount == 0) {
-        require_once __DIR__ . '/database/db-population-script.php';
+        header("Location: ".ROOT."/database/db-population-script.php");
+        exit();
     }
 ?>
 
