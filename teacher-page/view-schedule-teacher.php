@@ -20,12 +20,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="<?=ROOT?>/stylesheets/dashboard.css">
+    <script src="<?=ROOT?>/javascript/dashboard-sidebar.js" defer></script>
     <title>View Schedule</title>
 </head>
 <body>
     <div class="dashboard">
-        <aside class="sidebar" aria-label="Main navigation">
+        <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+            <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Collapse sidebar" aria-expanded="true">&#9776;</button>
             <div class="portal-brand">
+                <div class="sidebar-logo">
+                    <img src="<?=ROOT?>/image/BHP_University_Crest_512.png" alt="BHP University crest">
+                </div>
                 <h1>Teacher Portal</h1>
                 <p>Academic management dashboard</p>
             </div>

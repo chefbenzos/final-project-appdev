@@ -36,7 +36,7 @@
 
             <div class="portal-brand">
                 <div class="sidebar-logo">
-                    <img src="<?=ROOT?>/image/BHP_Icon.png" alt="Logo">
+                    <img src="<?=ROOT?>/image/BHP_University_Crest_512.png" alt="BHP University crest">
                 </div>
                 <h1>Student Portal</h1>
                 <p>Academic services dashboard</p>
